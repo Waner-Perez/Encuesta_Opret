@@ -29,7 +29,7 @@ class RepuestaResultadosScreen extends StatefulWidget {
 }
 
 class _RepuestaResultadosScreenState extends State<RepuestaResultadosScreen> {
-  final ApiServiceRespuesta _apiServiceRespuesta =  ApiServiceRespuesta('https://10.0.2.2:7190');
+  final ApiServiceRespuesta _apiServiceRespuesta =  ApiServiceRespuesta('https://192.168.1.103:7190');
   late Future<List<SpFiltrarRespuestas>> _respuestaData;
   List<SpRespuestasExport> report = [];
   final TextEditingController searchController = TextEditingController();
@@ -351,24 +351,24 @@ class _RepuestaResultadosScreenState extends State<RepuestaResultadosScreen> {
               padding: const EdgeInsets.all(16.0),
               child: Row(
                 children: [
-                  // Expanded(
-                  //   child: ElevatedButton(
-                  //     onPressed: () {
-                  //       _showView(context, 'Ver los resultado de las respuesta en Gráficas');
-                  //     },
-                  //     style: ElevatedButton.styleFrom(
-                  //         foregroundColor: Colors.white,
-                  //         backgroundColor: Colors.blue,
-                  //       textStyle: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  //       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  //       shape: RoundedRectangleBorder(
-                  //         borderRadius: BorderRadius.circular(50),
-                  //       )
-                  //     ),
-                  //     child: const Text('Ver gráfica')
-                  //   )
-                  // ),
-                  // const SizedBox(width: 20),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        _showView(context, 'Ver los resultado de las respuesta en Gráficas');
+                      },
+                      style: ElevatedButton.styleFrom(
+                          foregroundColor: Colors.white,
+                          backgroundColor: Colors.blue,
+                        textStyle: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(50),
+                        )
+                      ),
+                      child: const Text('Ver gráfica')
+                    )
+                  ),
+                  const SizedBox(width: 20),
 
                   Expanded(
                     child: ElevatedButton(
