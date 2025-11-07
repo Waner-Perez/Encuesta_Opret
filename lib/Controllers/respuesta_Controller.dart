@@ -7,8 +7,8 @@ import 'package:formulario_opret/services/respuestas_services.dart';
 class RespuestaController {
   final RespuestaCrud _respuestaCrud = RespuestaCrud();
   final StoredRespuestasCrud _storedRespuestasCrud = StoredRespuestasCrud();
-  final ApiServiceRespuesta _apiServiceRespuesta = ApiServiceRespuesta('https://192.168.1.103:7190');
-  final StreamServices _streamServices = StreamServices('https://192.168.1.103:7190');
+  final ApiServiceRespuesta _apiServiceRespuesta = ApiServiceRespuesta('http://api.encuesta.opret.gob.do:5020');
+  final StreamServices _streamServices = StreamServices('http://api.encuesta.opret.gob.do:5020');
 
   RespuestaController() {
     _streamServices.backendAvailabilityStream.listen((isAvailable) {

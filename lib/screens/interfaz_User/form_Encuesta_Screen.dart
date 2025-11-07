@@ -31,9 +31,9 @@ class FormEncuestaScreen extends StatefulWidget {
 
 class _FormEncuestaScreenState extends State<FormEncuestaScreen> {
   final _formKey = GlobalKey<FormBuilderState>();
-  final ApiServiceFormRegistro _apiServiceFormRegistro = ApiServiceFormRegistro('https://192.168.1.103:7190');
-  final ApiServiceLineas _apiServiceLineas = ApiServiceLineas('https://192.168.1.103:7190');
-  final ApiServiceEstacion _apiServiceEstacion = ApiServiceEstacion('https://192.168.1.103:7190');
+  final ApiServiceFormRegistro _apiServiceFormRegistro = ApiServiceFormRegistro('http://api.encuesta.opret.gob.do:5020');
+  final ApiServiceLineas _apiServiceLineas = ApiServiceLineas('http://api.encuesta.opret.gob.do:5020');
+  final ApiServiceEstacion _apiServiceEstacion = ApiServiceEstacion('http://api.encuesta.opret.gob.do:5020');
   final TextEditingController noEncuestaFiltrar = TextEditingController();
   String? _selectLineMetro; // Línea seleccionada
   int? _selectedStation; // Estación seleccionada
