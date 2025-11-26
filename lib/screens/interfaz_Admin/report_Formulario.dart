@@ -24,7 +24,7 @@ class ReportFormulario extends StatefulWidget {
 }
 
 class _ReportFormularioState extends State<ReportFormulario> {
-  final ApiServiceFormRegistro _apiServiceFormRegistro = ApiServiceFormRegistro('http://api.encuesta.opret.gob.do:5020');
+  final ApiServiceFormRegistro _apiServiceFormRegistro = ApiServiceFormRegistro('https://api.encuesta.opret.gob.do');
   late Future<List<SpFiltrarFormRegistro>> _formRegistroData;
   final TextEditingController searchController = TextEditingController();
   List<SpFiltrarFormRegistro> formFiltrados = [];

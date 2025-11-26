@@ -28,7 +28,7 @@ class RegistroEmpl extends StatefulWidget {
 }
 
 class _RegistroEmplState extends State<RegistroEmpl> {
-  final ApiServiceUser _apiServiceUser = ApiServiceUser('http://api.encuesta.opret.gob.do:5020'); // Cambia por tu URL
+  final ApiServiceUser _apiServiceUser = ApiServiceUser('https://api.encuesta.opret.gob.do'); // Cambia por tu URL
   late Future<List<Usuarios>> _usuariosdata;
   final TextEditingController datePicker = TextEditingController();
   final TextEditingController searchController = TextEditingController();

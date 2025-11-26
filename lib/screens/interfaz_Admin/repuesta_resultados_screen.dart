@@ -29,7 +29,7 @@ class RepuestaResultadosScreen extends StatefulWidget {
 }
 
 class _RepuestaResultadosScreenState extends State<RepuestaResultadosScreen> {
-  final ApiServiceRespuesta _apiServiceRespuesta =  ApiServiceRespuesta('http://api.encuesta.opret.gob.do:5020');
+  final ApiServiceRespuesta _apiServiceRespuesta =  ApiServiceRespuesta('https://api.encuesta.opret.gob.do');
   late Future<List<SpFiltrarRespuestas>> _respuestaData;
   List<SpRespuestasExport> report = [];
   final TextEditingController searchController = TextEditingController();

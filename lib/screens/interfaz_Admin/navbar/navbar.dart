@@ -29,7 +29,7 @@ class _NavbarState extends State<Navbar> {
 
   @override
   Widget build(BuildContext context) {
-    final ApiServiceToken _apiServiceToken = ApiServiceToken('http://api.encuesta.opret.gob.do:5020',false);
+    final ApiServiceToken _apiServiceToken = ApiServiceToken('https://api.encuesta.opret.gob.do',false);
 
     return Drawer(
       // Creación del menú desplegable

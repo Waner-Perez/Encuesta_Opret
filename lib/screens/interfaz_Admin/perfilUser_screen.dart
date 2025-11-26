@@ -27,7 +27,7 @@ class PerfiluserScreen extends StatefulWidget {
 
 class _PerfiluserScreenState extends State<PerfiluserScreen> {
   final formKey = GlobalKey<FormBuilderState>();
-  final ApiServiceUser _apiServiceUser = ApiServiceUser('http://api.encuesta.opret.gob.do:5020'); // Servicio para obtener datos del usuario
+  final ApiServiceUser _apiServiceUser = ApiServiceUser('https://api.encuesta.opret.gob.do'); // Servicio para obtener datos del usuario
   late Future<Usuarios?> _userData;
   final TextEditingController datePicker = TextEditingController();
   String selectedRole = 'Empleado';
