@@ -36,7 +36,7 @@ class _NewUserState extends State<NewUser> {
   // final UpperCaseTextEditingController _controller = UpperCaseTextEditingController(); 
   final TextEditingController datePicker = TextEditingController();
   DateTime? _selectedDate;
-  final ApiServiceUser _apiServiceUser = ApiServiceUser('https://api.encuesta.opret.gob.do');
+  final ApiServiceUser _apiServiceUser = ApiServiceUser('https://10.0.2.2:7190');
   bool _obscureText = true;
   bool isLoading = false; // Variable de control para el cuadro de carga
   // bool hasError = true; // Variable de control para el cuadro de Error de carga
@@ -429,27 +429,27 @@ class _NewUserState extends State<NewUser> {
                                 },
                               ),
 
-                              const SizedBox(height: 30),
-                              FormBuilderTextField(
-                                name: 'fechaCreacion',
-                                controller: datePicker,
-                                // enabled: false,
-                                readOnly: true, // Evita que el usuario escriba en el cuadro de texto
-                                decoration: InputDecorations.inputDecoration(
-                                  hintext: 'Puedes presionar aqui para elegir la fecha',
-                                  hintFrontSize: isTabletDevice ? 10.sp : 20.sp,
-                                  labeltext: 'Fecha',
-                                  labelFrontSize: isTabletDevice ? 15.sp : 20.sp,
-                                  icono: Icon(Icons.calendar_month_outlined, size: isTabletDevice ? 15.sp : 20.sp,),
-                                  errorSize: 20
-                                ),
-                                style: TextStyle(fontSize: isTabletDevice ? 15.sp : 20.sp),
-                                validator: FormBuilderValidators.required(),
-                                onTap: () async {
-                                  FocusScope.of(context).requestFocus(FocusNode()); // Cierra el teclado al hacer clic
-                                  await _showDatePicker(); // Muestra el DatePicker
-                                },
-                              ),
+                              // const SizedBox(height: 30),
+                              // FormBuilderTextField(
+                              //   name: 'fechaCreacion',
+                              //   controller: datePicker,
+                              //   // enabled: false,
+                              //   readOnly: true, // Evita que el usuario escriba en el cuadro de texto
+                              //   decoration: InputDecorations.inputDecoration(
+                              //     hintext: 'Puedes presionar aqui para elegir la fecha',
+                              //     hintFrontSize: isTabletDevice ? 10.sp : 20.sp,
+                              //     labeltext: 'Fecha',
+                              //     labelFrontSize: isTabletDevice ? 15.sp : 20.sp,
+                              //     icono: Icon(Icons.calendar_month_outlined, size: isTabletDevice ? 15.sp : 20.sp,),
+                              //     errorSize: 20
+                              //   ),
+                              //   style: TextStyle(fontSize: isTabletDevice ? 15.sp : 20.sp),
+                              //   validator: FormBuilderValidators.required(),
+                              //   onTap: () async {
+                              //     FocusScope.of(context).requestFocus(FocusNode()); // Cierra el teclado al hacer clic
+                              //     await _showDatePicker(); // Muestra el DatePicker
+                              //   },
+                              // ),
 
                               const SizedBox(height: 30),
                               FormBuilderDropdown<String>(

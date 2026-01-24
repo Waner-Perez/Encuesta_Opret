@@ -28,7 +28,7 @@ class RegistroEmpl extends StatefulWidget {
 }
 
 class _RegistroEmplState extends State<RegistroEmpl> {
-  final ApiServiceUser _apiServiceUser = ApiServiceUser('https://api.encuesta.opret.gob.do'); // Cambia por tu URL
+  final ApiServiceUser _apiServiceUser = ApiServiceUser('https://10.0.2.2:7190'); // Cambia por tu URL
   late Future<List<Usuarios>> _usuariosdata;
   final TextEditingController datePicker = TextEditingController();
   final TextEditingController searchController = TextEditingController();
@@ -74,7 +74,7 @@ class _RegistroEmplState extends State<RegistroEmpl> {
         usuario1: '',
         email: '',
         passwords: '',
-        fechaCreacion: '',
+        fechaCreacion: null,
         rol: ''
       ) // Devolver un objeto de Usuario vacío
     );
@@ -500,7 +500,7 @@ class _RegistroEmplState extends State<RegistroEmpl> {
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: isTabletDevice ? 28.0 : 20, color: Colors.white),
                 ),
                 TextSpan(
-                  text: usuariosFiltrados!.fechaCreacion,
+                  text: usuariosFiltrados!.fechaCreacion.toString(),
                   style: TextStyle(fontSize: isTabletDevice ? 28.0 : 20, color: Colors.white),
                 ),
               ]
@@ -678,23 +678,23 @@ class _RegistroEmplState extends State<RegistroEmpl> {
                         },
                       ),
               
-                      FormBuilderTextField(
-                        name: 'fechaCreacion',
-                        controller: datePicker,
-                        style: TextStyle(fontSize: isTabletDevice ? 25.0 : 17),
-                        readOnly: true, // Evita que el usuario escriba en el cuadro de texto
-                        decoration: InputDecorations.inputDecoration(
-                          labeltext: 'Fecha de Ingreso',
-                          labelFrontSize: isTabletDevice ? 30.5 : 18.5,
-                          icono: Icon(Icons.calendar_month_outlined, size: isTabletDevice ? 30.0 : 20),
-                          errorSize: isTabletDevice ? 10.sp : 10
-                        ),
-                        validator: FormBuilderValidators.required(),
-                        onTap: () async {
-                          FocusScope.of(context).requestFocus(FocusNode()); // Cierra el teclado al hacer clic
-                          await _showDatePicker(); // Muestra el DatePicker
-                        },
-                      ),
+                      // FormBuilderTextField(
+                      //   name: 'fechaCreacion',
+                      //   controller: datePicker,
+                      //   style: TextStyle(fontSize: isTabletDevice ? 25.0 : 17),
+                      //   readOnly: true, // Evita que el usuario escriba en el cuadro de texto
+                      //   decoration: InputDecorations.inputDecoration(
+                      //     labeltext: 'Fecha de Ingreso',
+                      //     labelFrontSize: isTabletDevice ? 30.5 : 18.5,
+                      //     icono: Icon(Icons.calendar_month_outlined, size: isTabletDevice ? 30.0 : 20),
+                      //     errorSize: isTabletDevice ? 10.sp : 10
+                      //   ),
+                      //   validator: FormBuilderValidators.required(),
+                      //   onTap: () async {
+                      //     FocusScope.of(context).requestFocus(FocusNode()); // Cierra el teclado al hacer clic
+                      //     await _showDatePicker(); // Muestra el DatePicker
+                      //   },
+                      // ),
             
                       FormBuilderDropdown<String>(
                         name: 'rol',
@@ -737,7 +737,7 @@ class _RegistroEmplState extends State<RegistroEmpl> {
                                   usuario1: formData['usuario'],
                                   email: formData['email'],
                                   passwords: formData['password'], 
-                                  fechaCreacion: formData['fechaCreacion'],
+                                  // fechaCreacion: formData['fechaCreacion'],
                                   // fechaCreacion: DateFormat("yyyy-MM-dd").format(DateTime.now()), // Fecha actual
                                   rol: selectedRole, 
                                 );
@@ -956,7 +956,7 @@ class _RegistroEmplState extends State<RegistroEmpl> {
                     email: formData['email'],
                     // passwords: userUpload.passwords,
                     passwords: formData['password'],
-                    fechaCreacion: userUpload.fechaCreacion, // Mantener la fecha original
+                    // fechaCreacion: userUpload.fechaCreacion, // Mantener la fecha original
                     rol: userUpload.rol, // Mantener el rol original
                     // fotoEmpl: usuario.fotoEmpl, // Mantener la foto original
                   );
@@ -1218,7 +1218,8 @@ class _UsuariosDataSource extends DataTableSource {
         DataCell(Text(usuario.nombreApellido, style: TextStyle(fontSize: isTabletDevice ? 9.5.sp : 14.sp))),
         DataCell(Text(usuario.usuario1, style: TextStyle(fontSize: isTabletDevice ? 9.5.sp : 14.sp))),
         DataCell(Text(usuario.email, style: TextStyle(fontSize: isTabletDevice ? 9.5.sp : 14.sp))),
-        DataCell(Text(usuario.fechaCreacion, style: TextStyle(fontSize: isTabletDevice ? 9.5.sp : 14.sp))),
+        DataCell(usuario.fechaCreacion != null ? Text(usuario.fechaCreacion!.toString().substring(0, 10), style: TextStyle(fontSize: isTabletDevice ? 9.5.sp : 14.sp)) : const Text('')),
+        // DataCell(Text(usuario.fechaCreacion != null ? usuario.fechaCreacion.toString().substring(0, 10) : '-', style: TextStyle(fontSize: isTabletDevice ? 9.5.sp : 14.sp))),
         DataCell(Text(usuario.rol, style: TextStyle(fontSize: isTabletDevice ? 9.5.sp : 14.sp))),
         DataCell(
           Row(

@@ -5,7 +5,7 @@ class Usuarios {
   String usuario1;
   String email;
   String passwords;
-  String fechaCreacion;
+  String? fechaCreacion;
   String rol;
 
   Usuarios({
@@ -15,7 +15,7 @@ class Usuarios {
     required this.usuario1,
     required this.email,
     required this.passwords,
-    required this.fechaCreacion,
+    this.fechaCreacion,
     required this.rol
   });
 
@@ -42,7 +42,7 @@ class Usuarios {
     data['usuario'] = usuario1;
     data['email'] = email;
     data['passwords'] = passwords;
-    data['fechaCreacion'] = fechaCreacion;
+    // data['fechaCreacion'] = fechaCreacion;
     data['rol'] = rol;
     return data;
   }
