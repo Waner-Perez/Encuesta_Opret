@@ -9,7 +9,7 @@ import 'package:formulario_opret/services/user_services.dart';
 import 'package:formulario_opret/widgets/input_decoration.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 // import 'package:formulario_opret/widgets/upperCaseText.dart';
-import 'package:intl/intl.dart';
+// import 'package:intl/intl.dart';
 import 'package:flutter/services.dart'; // Importa esto para controlar la orientación
 
 class NewUser extends StatefulWidget {
@@ -35,7 +35,7 @@ class _NewUserState extends State<NewUser> {
   final _formkey = GlobalKey<FormBuilderState>();
   // final UpperCaseTextEditingController _controller = UpperCaseTextEditingController(); 
   final TextEditingController datePicker = TextEditingController();
-  DateTime? _selectedDate;
+  // DateTime? _selectedDate;
   final ApiServiceUser _apiServiceUser = ApiServiceUser('https://10.0.2.2:7190');
   bool _obscureText = true;
   bool isLoading = false; // Variable de control para el cuadro de carga
@@ -704,29 +704,29 @@ class _NewUserState extends State<NewUser> {
     );
   }
 
-  Future<void> _showDatePicker() async {
-    final picked = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(), 
-      // firstDate: DateTime(2024, 9, 1),
-      firstDate: DateTime.now(),
-      lastDate: DateTime.now(),
-      builder: (BuildContext content, Widget? child) {
-        return Theme(
-          data: ThemeData.light().copyWith(
-            colorScheme: const ColorScheme.light(primary: Colors.green),
-            buttonTheme: const ButtonThemeData(textTheme: ButtonTextTheme.primary),
-          ),
-          child: child!,
-        );
-      }
-    );
+  // Future<void> _showDatePicker() async {
+  //   final picked = await showDatePicker(
+  //     context: context,
+  //     initialDate: DateTime.now(), 
+  //     // firstDate: DateTime(2024, 9, 1),
+  //     firstDate: DateTime.now(),
+  //     lastDate: DateTime.now(),
+  //     builder: (BuildContext content, Widget? child) {
+  //       return Theme(
+  //         data: ThemeData.light().copyWith(
+  //           colorScheme: const ColorScheme.light(primary: Colors.green),
+  //           buttonTheme: const ButtonThemeData(textTheme: ButtonTextTheme.primary),
+  //         ),
+  //         child: child!,
+  //       );
+  //     }
+  //   );
 
-    if (picked != null && picked != _selectedDate) {
-      setState(() {
-        _selectedDate = picked;
-        datePicker.text = DateFormat("yyyy-MM-dd").format(_selectedDate!); // Formatea la fecha seleccionada
-      });
-    }
-  }
+  //   if (picked != null && picked != _selectedDate) {
+  //     setState(() {
+  //       _selectedDate = picked;
+  //       datePicker.text = DateFormat("yyyy-MM-dd").format(_selectedDate!); // Formatea la fecha seleccionada
+  //     });
+  //   }
+  // }
 }

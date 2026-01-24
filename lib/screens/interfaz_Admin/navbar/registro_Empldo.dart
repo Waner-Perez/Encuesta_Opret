@@ -7,7 +7,7 @@ import 'package:formulario_opret/models/usuarios.dart';
 import 'package:formulario_opret/screens/interfaz_Admin/navbar/navbar.dart';
 import 'package:formulario_opret/services/user_services.dart';
 import 'package:formulario_opret/widgets/input_decoration.dart';
-import 'package:intl/intl.dart';
+// import 'package:intl/intl.dart';
 
 class RegistroEmpl extends StatefulWidget {
   final TextEditingController filtrarUsuarioController;
@@ -33,7 +33,7 @@ class _RegistroEmplState extends State<RegistroEmpl> {
   final TextEditingController datePicker = TextEditingController();
   final TextEditingController searchController = TextEditingController();
   Usuarios? usuariosFiltrados;
-  DateTime? _selectedDate;
+  // DateTime? _selectedDate;
   Offset position = const Offset(500, 900); // Posición inicial del botón
   String selectedRole = 'Empleado';
   int _paginaActual = 0; // Página actual del PaginatedDataTable
@@ -92,31 +92,31 @@ class _RegistroEmplState extends State<RegistroEmpl> {
     }); 
   }
 
-  Future<void> _showDatePicker() async {
-    final picked = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(), 
-      // firstDate: DateTime(2024, 9, 1),
-      firstDate: DateTime.now(),
-      lastDate: DateTime.now(),
-      builder: (BuildContext content, Widget? child) {
-        return Theme(
-          data: ThemeData.light().copyWith(
-            colorScheme: const ColorScheme.light(primary: Colors.green),
-            buttonTheme: const ButtonThemeData(textTheme: ButtonTextTheme.primary),
-          ),
-          child: child!,
-        );
-      }
-    );
+  // Future<void> _showDatePicker() async {
+  //   final picked = await showDatePicker(
+  //     context: context,
+  //     initialDate: DateTime.now(), 
+  //     // firstDate: DateTime(2024, 9, 1),
+  //     firstDate: DateTime.now(),
+  //     lastDate: DateTime.now(),
+  //     builder: (BuildContext content, Widget? child) {
+  //       return Theme(
+  //         data: ThemeData.light().copyWith(
+  //           colorScheme: const ColorScheme.light(primary: Colors.green),
+  //           buttonTheme: const ButtonThemeData(textTheme: ButtonTextTheme.primary),
+  //         ),
+  //         child: child!,
+  //       );
+  //     }
+  //   );
 
-    if (picked != null && picked != _selectedDate) {
-      setState(() {
-        _selectedDate = picked;
-        datePicker.text = DateFormat("yyyy-MM-dd").format(_selectedDate!); // Formatea la fecha seleccionada
-      });
-    }
-  }
+  //   if (picked != null && picked != _selectedDate) {
+  //     setState(() {
+  //       _selectedDate = picked;
+  //       datePicker.text = DateFormat("yyyy-MM-dd").format(_selectedDate!); // Formatea la fecha seleccionada
+  //     });
+  //   }
+  // }
 
   void _ubicarUsuarios(String? idUsuario, String? nombre, String? user) async {
     try {
