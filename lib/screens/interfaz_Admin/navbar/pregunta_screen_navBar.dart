@@ -2052,6 +2052,9 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                     // Refrescar la lista de usuarios aquí
                     _showSuccessDialog(context, 'La Sección fue eliminado con éxito');
                     _refreshSesion();
+                  } else if (response.statusCode == 400) {
+                    final responseBody = jsonDecode(response.body);
+                    _showErrorDialog(context, responseBody['message']);
                   } else {
                     print('Error al eliminar la sección: ${response.body}');
                     _showErrorDialog(context, 'Error al eliminar la sesión');
