@@ -22,7 +22,7 @@ class SpPreguntascompleta {
     return SpPreguntascompleta(
       sp_CodPregunta: json['codPregunta'], //esto es lo mismo que la Sesion 
       sp_TipoRespuesta: json['tipoRespuesta'],
-        sp_noIdentifEncuesta: json['noIdentifEncuesta'],
+      sp_noIdentifEncuesta: json['noIdentifEncuesta'],
       sp_Pregunta: json['pregunta'],
       sp_SubPregunta: json['subPregunta'],
       sp_Estado: json['estado'],

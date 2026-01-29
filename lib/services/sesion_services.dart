@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:formulario_opret/models/Stored%20Procedure/sp_preguntasCompleta.dart';
+import 'package:formulario_opret/models/dto_ShowQuestions.dart';
 import 'package:formulario_opret/models/pregunta.dart';
 import 'package:formulario_opret/services/http_interactor_services.dart';
 import 'package:http/http.dart' as http;
@@ -20,6 +21,28 @@ class ApiServiceSesion2 {
         final response = await service.getAllData('PreguntasCompletas/obtenerQuestion');
         if (response.isNotEmpty) {
           dataQuestion = response.map<SpPreguntascompleta>((json) => SpPreguntascompleta.fromJson(json)).toList();
+          return dataQuestion;
+        } else {
+          throw Exception('API response is empty.');
+        }
+      } catch (e) {
+        print('Excepción durante la solicitud a la API: $e'); 
+        rethrow;
+      }
+    } else {
+      throw Exception('La API no está disponible.');
+    }
+  }
+
+  Future<List<DtoShowQuestions>> getDtoShowQuestionsListada() async {
+    List<DtoShowQuestions> dataQuestion = [];
+    final isCheckOk = await service.check();
+
+    if (isCheckOk) {
+      try {
+        final response = await service.getAllData('Sesions/showQuestion');
+        if (response.isNotEmpty) {
+          dataQuestion = response.map<DtoShowQuestions>((json) => DtoShowQuestions.fromJson(json)).toList();
           return dataQuestion;
         } else {
           throw Exception('API response is empty.');

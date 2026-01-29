@@ -4,6 +4,7 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
+import 'package:formulario_opret/models/dto_ShowQuestions.dart';
 import 'package:formulario_opret/models/pregunta.dart';
 import 'package:formulario_opret/screens/interfaz_Admin/navbar/navbar.dart';
 import 'package:formulario_opret/services/pregunta_services.dart';
@@ -36,6 +37,8 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
   late Future<List<SubPregunta>> _subPreguntasData;
   final ApiServiceSesion _apiServiceSesion = ApiServiceSesion('https://10.0.2.2:7190');
   late Future<List<Sesion>> _sesionData;
+  final ApiServiceSesion2 _apiServiceSesion2 = ApiServiceSesion2('https://10.0.2.2:7190');
+  late Future<List<DtoShowQuestions>> _dtoShowQuestionsData;
   String selectedTipRespuestas = 'Respuesta Abierta';
   final tipoRespuestaController = TextEditingController();
   Offset position = const Offset(500, 900);
@@ -189,6 +192,14 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
       _preguntaFiltrada = _todosCampPreguntas;
       _subPreguntaFiltrada = _todosCampSubPreguntas;
       _sesionFiltrada = _todosCampSesion;
+    });
+  }
+
+  // Método para ordenar las secciones por estado mientras sea true estas estarán arriba
+  void _sortSectionByState(List<Sesion> lista){
+    lista.sort((a, b) {
+      if (a.estado != b.estado) return a.estado ? -1 : 1;
+      return 0;
     });
   }
 
@@ -755,6 +766,8 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                             final sesionTable = _sesionFiltrada.isNotEmpty
                                   ? _sesionFiltrada
                                   : snapshot.data ?? [];
+
+                            _sortSectionByState(sesionTable);
 
                             bool estadoActivo = sesionTable.every((sesion) => sesion.estado);
 
@@ -1463,20 +1476,20 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    FormBuilderTextField(
-                      name: 'identifEncuesta',
-                      keyboardType: TextInputType.number,
-                      style: TextStyle(fontSize: isTabletDevice ? 11.5.sp : 11.5.sp, color: const Color.fromARGB(255, 1, 1, 1)),
-                      decoration: InputDecorations.inputDecoration(
-                        labeltext: 'No. Pregunta en la Encuesta',
-                        labelFrontSize: isTabletDevice ? 15.sp : 15.sp,
-                        hintext: 'Ingresar el No. Identificación de la pregunta',
-                        hintFrontSize: isTabletDevice ? 10.sp : 10.sp,
-                        icono: Icon(Icons.question_answer, size: isTabletDevice ? 15.sp : 15.sp),
-                        errorSize: isTabletDevice ? 10.sp : 10.sp,
-                      ),
-                      validator: FormBuilderValidators.required(errorText: 'Este campo es requerido'),
-                    ),
+                    // FormBuilderTextField(
+                    //   name: 'identifEncuesta',
+                    //   keyboardType: TextInputType.number,
+                    //   style: TextStyle(fontSize: isTabletDevice ? 11.5.sp : 11.5.sp, color: const Color.fromARGB(255, 1, 1, 1)),
+                    //   decoration: InputDecorations.inputDecoration(
+                    //     labeltext: 'No. Pregunta en la Encuesta',
+                    //     labelFrontSize: isTabletDevice ? 15.sp : 15.sp,
+                    //     hintext: 'Ingresar el No. Identificación de la pregunta',
+                    //     hintFrontSize: isTabletDevice ? 10.sp : 10.sp,
+                    //     icono: Icon(Icons.question_answer, size: isTabletDevice ? 15.sp : 15.sp),
+                    //     errorSize: isTabletDevice ? 10.sp : 10.sp,
+                    //   ),
+                    //   validator: FormBuilderValidators.required(errorText: 'Este campo es requerido'),
+                    // ),
               
                     FormBuilderDropdown<int>(
                       name: 'codPregunta',
@@ -1775,20 +1788,20 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  FormBuilderTextField(
-                    name: 'identifEncuesta',
-                    keyboardType: TextInputType.number,
-                    style: TextStyle(fontSize: isTabletDevice ? 11.5.sp : 11.5.sp, color: const Color.fromARGB(255, 1, 1, 1)),
-                    decoration: InputDecorations.inputDecoration(
-                      labeltext: 'No. Pregunta en la Encuesta',
-                      labelFrontSize: isTabletDevice ? 15.sp : 15.sp,
-                      hintext: 'Ingresar el No. Identificación de la pregunta',
-                      hintFrontSize: isTabletDevice ? 10.sp : 10.sp,
-                      icono: Icon(Icons.question_answer, size: isTabletDevice ? 15.sp : 15.sp),
-                      errorSize: isTabletDevice ? 10.sp : 10.sp,
-                    ),
-                    validator: FormBuilderValidators.required(errorText: 'Este campo es requerido'),
-                  ),
+                  // FormBuilderTextField(
+                  //   name: 'identifEncuesta',
+                  //   keyboardType: TextInputType.number,
+                  //   style: TextStyle(fontSize: isTabletDevice ? 11.5.sp : 11.5.sp, color: const Color.fromARGB(255, 1, 1, 1)),
+                  //   decoration: InputDecorations.inputDecoration(
+                  //     labeltext: 'No. Pregunta en la Encuesta',
+                  //     labelFrontSize: isTabletDevice ? 15.sp : 15.sp,
+                  //     hintext: 'Ingresar el No. Identificación de la pregunta',
+                  //     hintFrontSize: isTabletDevice ? 10.sp : 10.sp,
+                  //     icono: Icon(Icons.question_answer, size: isTabletDevice ? 15.sp : 15.sp),
+                  //     errorSize: isTabletDevice ? 10.sp : 10.sp,
+                  //   ),
+                  //   validator: FormBuilderValidators.required(errorText: 'Este campo es requerido'),
+                  // ),
 
                   FormBuilderDropdown<String>(
                     name: 'tipoRespuesta',
@@ -2444,7 +2457,7 @@ class _SesionDataSource extends DataTableSource {
               print('Cambiando el estado a: $value');
               section.estado = value;
               _estado(section);
-              notifyListeners(); // Notifica los cambios en la tabla
+              //notifyListeners(); // Notifica los cambios en la tabla
             },
             width: 120.0,
             height: isTabletDevice ? 27.5.h : 29.h,
