@@ -35,24 +35,18 @@ class ApiServiceSesion2 {
   }
 
   Future<List<DtoShowQuestions>> getDtoShowQuestionsListada() async {
-    List<DtoShowQuestions> dataQuestion = [];
     final isCheckOk = await service.check();
 
-    if (isCheckOk) {
-      try {
-        final response = await service.getAllData('Sesions/showQuestion');
-        if (response.isNotEmpty) {
-          dataQuestion = response.map<DtoShowQuestions>((json) => DtoShowQuestions.fromJson(json)).toList();
-          return dataQuestion;
-        } else {
-          throw Exception('API response is empty.');
-        }
-      } catch (e) {
-        print('Excepción durante la solicitud a la API: $e'); 
-        rethrow;
-      }
-    } else {
-      throw Exception('La API no está disponible.');
+    if(!isCheckOk) throw Exception('La API no está disponible.');
+
+    try {
+      final response = await service.getAllData('Sesions/showQuestion');
+
+      if(response.isEmpty) return [];
+      return response.map<DtoShowQuestions>((json) => DtoShowQuestions.fromJson(json)).toList();
+    } catch (e) {
+      print('Excepción durante la solicitud a la API: $e'); 
+      rethrow;
     }
   }
 }

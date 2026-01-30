@@ -35,8 +35,8 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
   late Future<List<Preguntas>> _preguntasData;
   final ApiServiceSubPreguntas  _apiServiceSubPreguntas = ApiServiceSubPreguntas('https://10.0.2.2:7190');
   late Future<List<SubPregunta>> _subPreguntasData;
-  final ApiServiceSesion _apiServiceSesion = ApiServiceSesion('https://10.0.2.2:7190');
-  late Future<List<Sesion>> _sesionData;
+  // final ApiServiceSesion _apiServiceSesion = ApiServiceSesion('https://10.0.2.2:7190');
+  // late Future<List<Sesion>> _sesionData;
   final ApiServiceSesion2 _apiServiceSesion2 = ApiServiceSesion2('https://10.0.2.2:7190');
   late Future<List<DtoShowQuestions>> _dtoShowQuestionsData;
   String selectedTipRespuestas = 'Respuesta Abierta';
@@ -57,8 +57,10 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
   String selectedFilterSubPregunta = 'Id de Sub pregunta';
   //----------------------------------------------------------Filtrar-Sesion------------------------------------------------
   final TextEditingController searchSesionController = TextEditingController();
-  List<Sesion> _sesionFiltrada = [];
-  List<Sesion> _todosCampSesion = [];
+  // List<Sesion> _sesionFiltrada = [];
+  List<DtoShowQuestions> _sesionFiltrada = [];
+  // List<Sesion> _todosCampSesion = [];
+  List<DtoShowQuestions> _todosCampSesion = [];
   String selectedFilterSesion = 'Numero de Seccion';
   //------------------------------------------------------------------------------------------------------------------------
 
@@ -67,7 +69,8 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
     super.initState();
     _preguntasData = _apiServicePreguntas.getPreguntas();
     _subPreguntasData = _apiServiceSubPreguntas.getSubPreg();
-    _sesionData = _apiServiceSesion.getSesion();
+    // _sesionData = _apiServiceSesion.getSesion();
+    _dtoShowQuestionsData = _apiServiceSesion2.getDtoShowQuestionsListada();
     _fetchData();
     _fetchDataSubPregu();
     _refreshSesion();
@@ -147,16 +150,44 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
     });
   }
 
+  // MAPPER DTO → SESION
+  Sesion mapDtoToSesion(DtoShowQuestions dto) {
+    return Sesion(
+      idSesion: dto.idSesionDto,
+      tipoRespuesta: dto.tipoRespuestaDto,
+      identifEncuesta: dto.identifEncuestaDto,
+      codPregunta: dto.codPreguntaDto,
+      codSubPregunta: dto.codSubPreguntaDto,
+      estado: dto.estadoDto,
+      rango: dto.rangoDto,
+    );
+  }
+
+  //Metodo puente
+  void onEditFromDto(DtoShowQuestions dto) {
+    _showEditDialogSesion(mapDtoToSesion(dto));
+  }
+
+  void onDeleteFromDto(DtoShowQuestions dto) {
+    _showDeleteDialogSesion(mapDtoToSesion(dto));
+  }
+
+  void onEstadoFromDto(DtoShowQuestions dto) {
+    _actualizarEstado(mapDtoToSesion(dto));
+  }
+
   Future<void> _refreshSesion() async {
-    final se = await _apiServiceSesion.getSesion();
+    // final se = await _apiServiceSesion.getSesion();
+    final se = await _apiServiceSesion2.getDtoShowQuestionsListada();
 
     setState(() {
       _sesionFiltrada = se;
       _todosCampSesion = se;
-      _sesionData = Future.value(se);
+      // _sesionData = Future.value(se);
+      _dtoShowQuestionsData = Future.value(se);
       //-----------------------------------------
 
-      _sesionData = _apiServiceSesion.getSesion();
+      _dtoShowQuestionsData = _apiServiceSesion2.getDtoShowQuestionsListada();
     });
   }
 
@@ -165,15 +196,13 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
     final filtrar = _todosCampSesion.where((setion) {
       switch (selectedFilterSesion) {
         case 'Numero de Seccion':
-          return setion.idSesion?.toString().toLowerCase().contains(queryLower) ?? false;
+          return setion.idSesionDto?.toString().contains(queryLower) ?? false;
         case 'Tipo de Respuesta':
-          return setion.tipoRespuesta.toLowerCase().contains(queryLower);
-        // case 'Tema':
-        //   return setion.grupoTema?.toLowerCase().contains(queryLower) ?? false;
+          return setion.tipoRespuestaDto.toLowerCase().contains(queryLower);
         case 'Numero de Pregunta':
-          return setion.codPregunta.toString().toLowerCase().contains(queryLower);
+          return setion.codPreguntaDto.toString().contains(queryLower);
         case 'No. de Sup Pregunta':
-          return setion.codSubPregunta?.toLowerCase().contains(queryLower) ?? false;
+          return setion.codSubPreguntaDto?.contains(queryLower) ?? false;
         default:
           return false;
       }
@@ -196,9 +225,9 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
   }
 
   // Método para ordenar las secciones por estado mientras sea true estas estarán arriba
-  void _sortSectionByState(List<Sesion> lista){
+  void _sortSectionByState(List<DtoShowQuestions> lista){
     lista.sort((a, b) {
-      if (a.estado != b.estado) return a.estado ? -1 : 1;
+      if (a.estadoDto != b.estadoDto) return a.estadoDto ? -1 : 1;
       return 0;
     });
   }
@@ -754,13 +783,13 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                       const SizedBox(height: 20),
                       const Divider(),
 
-                      FutureBuilder<List<Sesion>>(
-                        future: _sesionData,
+                      FutureBuilder<List<DtoShowQuestions>>(
+                        future: _dtoShowQuestionsData,
                         builder: (context, snapshot) {
                           if (snapshot.connectionState == ConnectionState.waiting) {
                             return const Center(child: CircularProgressIndicator());
                           }else if (snapshot.hasError) {
-                            print('Error al cargar la Sección: ${snapshot.error}');
+                            print('snapshot.hasError: ${snapshot.hasError}');
                             return Center(child: Text('"Lo sentimos, no pudimos cargar la información en este momento. \nPor favo, inténtalo nuevamente presionando el (botón Refrescar)"', style: TextStyle(fontSize: isTabletDevice ? 11.sp : 9.sp, fontWeight: FontWeight.bold)));
                           } else if (snapshot.hasData) {
                             final sesionTable = _sesionFiltrada.isNotEmpty
@@ -769,7 +798,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
 
                             _sortSectionByState(sesionTable);
 
-                            bool estadoActivo = sesionTable.every((sesion) => sesion.estado);
+                            bool estadoActivo = sesionTable.every((sesion) => sesion.estadoDto);
 
                             return Container(
                               margin: const EdgeInsets.all(2.0),
@@ -804,12 +833,14 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                                     DataColumn(label: Text('Tipo de Respuesta.', style: TextStyle(fontSize: isTabletDevice ? 9.sp : 9.sp, color: Colors.white, fontWeight: FontWeight.bold))),
                                     DataColumn(label: Text('Número de \nPregunta en la \nEncuesta.', style: TextStyle(fontSize: isTabletDevice ? 9.sp : 9.sp, color: Colors.white, fontWeight: FontWeight.bold))),
                                     DataColumn(label: Text('No. Pregunta.', style: TextStyle(fontSize: isTabletDevice ? 9.sp : 9.sp, color: Colors.white, fontWeight: FontWeight.bold))),
+                                    DataColumn(label: Text('Pregunta.', style: TextStyle(fontSize: isTabletDevice ? 9.sp : 9.sp, color: Colors.white, fontWeight: FontWeight.bold))),
                                     DataColumn(label: Text('No. Sub Pregunta.', style: TextStyle(fontSize: isTabletDevice ? 9.sp : 9.sp, color: Colors.white, fontWeight: FontWeight.bold))),
+                                    DataColumn(label: Text('Sub Pregunta.', style: TextStyle(fontSize: isTabletDevice ? 9.sp : 9.sp, color: Colors.white, fontWeight: FontWeight.bold))),
                                     DataColumn(label: Text('Requerimiento (Opcional).', style: TextStyle(fontSize: isTabletDevice ? 9.sp : 9.sp, color: Colors.white, fontWeight: FontWeight.bold))),
                                     DataColumn(label: Text('Enviar esta \npregunta a la \nencuesta.', style: TextStyle(fontSize: isTabletDevice ? 9.sp : 9.sp, color: Colors.white, fontWeight: FontWeight.bold))),
                                     DataColumn(label: Text('Acción', style: TextStyle(fontSize: isTabletDevice ? 9.sp : 9.sp, color: Colors.white, fontWeight: FontWeight.bold)))
                                   ],
-                                  source: _SesionDataSource(sesionTable, _showEditDialogSesion, _showDeleteDialogSesion, _actualizarEstado, isTabletDevice),
+                                  source: _DtoShowQuestionsDataSource(sesionTable, onEditFromDto, onDeleteFromDto, onEstadoFromDto, isTabletDevice),
                                   headingRowColor: WidgetStateProperty.all<Color>(const Color.fromARGB(255, 2, 37, 4)), // Fondo de encabezado
                                   rowsPerPage: 5, //numeros de filas
                                   columnSpacing: 50, //espacios entre columnas
@@ -822,10 +853,10 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                                   actions: [
                                     ElevatedButton(
                                       onPressed: () {
-                                        _actualizarEstadoTodasSesiones(!estadoActivo);
+                                        _actualizarEstadoTodasSesiones(sesionTable, !estadoActivo);
                                         setState(() {
                                           for (var sesion in sesionTable) {
-                                            sesion.estado = !estadoActivo;
+                                            sesion.estadoDto = !estadoActivo;
                                           }
                                         });
                                       },
@@ -1181,9 +1212,11 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                     _fetchData();
                   } else if (response.statusCode == 400) {
                     final responseBody = jsonDecode(response.body);
+                    Navigator.of(context).pop();
                     _showErrorDialog(context, responseBody['message']);
                   } else {
                     print('Error al eliminar la pregunta: ${response.body}');
+                    Navigator.of(context).pop();
                     _showErrorDialog(context, 'Error al eliminar la Pregunta: ${response.body}');
                   }
                 } catch (e) {
@@ -1438,10 +1471,12 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                     _showSuccessDialog(context, 'Las sub-Preguntas fue creado con éxito');
                     _fetchDataSubPregu();
                   } else if (response.statusCode == 400) {
+                    Navigator.of(context).pop();
                     final responseBody = jsonDecode(response.body);
                     _showErrorDialog(context, responseBody['message']);
                   } else {
                     print('Error al eliminar la sub-pregunta: ${response.body}');
+                    Navigator.of(context).pop();
                     _showErrorDialog(context, 'Error al eliminar la Sub-Pregunta: ${response.body}');
                   }
                 } catch (e) {
@@ -1788,20 +1823,21 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // FormBuilderTextField(
-                  //   name: 'identifEncuesta',
-                  //   keyboardType: TextInputType.number,
-                  //   style: TextStyle(fontSize: isTabletDevice ? 11.5.sp : 11.5.sp, color: const Color.fromARGB(255, 1, 1, 1)),
-                  //   decoration: InputDecorations.inputDecoration(
-                  //     labeltext: 'No. Pregunta en la Encuesta',
-                  //     labelFrontSize: isTabletDevice ? 15.sp : 15.sp,
-                  //     hintext: 'Ingresar el No. Identificación de la pregunta',
-                  //     hintFrontSize: isTabletDevice ? 10.sp : 10.sp,
-                  //     icono: Icon(Icons.question_answer, size: isTabletDevice ? 15.sp : 15.sp),
-                  //     errorSize: isTabletDevice ? 10.sp : 10.sp,
-                  //   ),
-                  //   validator: FormBuilderValidators.required(errorText: 'Este campo es requerido'),
-                  // ),
+                  FormBuilderTextField(
+                    name: 'identifEncuesta',
+                    enabled: false,
+                    keyboardType: TextInputType.number,
+                    style: TextStyle(fontSize: isTabletDevice ? 11.5.sp : 11.5.sp, color: const Color.fromARGB(255, 1, 1, 1)),
+                    decoration: InputDecorations.inputDecoration(
+                      labeltext: 'No. Pregunta en la Encuesta',
+                      labelFrontSize: isTabletDevice ? 15.sp : 15.sp,
+                      hintext: 'Ingresar el No. Identificación de la pregunta',
+                      hintFrontSize: isTabletDevice ? 10.sp : 10.sp,
+                      icono: Icon(Icons.question_answer, size: isTabletDevice ? 15.sp : 15.sp),
+                      errorSize: isTabletDevice ? 10.sp : 10.sp,
+                    ),
+                    validator: FormBuilderValidators.required(errorText: 'Este campo es requerido'),
+                  ),
 
                   FormBuilderDropdown<String>(
                     name: 'tipoRespuesta',
@@ -2066,10 +2102,12 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                     _showSuccessDialog(context, 'La Sección fue eliminado con éxito');
                     _refreshSesion();
                   } else if (response.statusCode == 400) {
+                    Navigator.of(context).pop();
                     final responseBody = jsonDecode(response.body);
                     _showErrorDialog(context, responseBody['message']);
                   } else {
                     print('Error al eliminar la sección: ${response.body}');
+                    Navigator.of(context).pop();
                     _showErrorDialog(context, 'Error al eliminar la sesión');
                   }
                 } catch (e) {
@@ -2131,10 +2169,12 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
     }
   }
 
-  void _actualizarEstadoTodasSesiones(bool nuevoEstado) async {
+  Future<void> _actualizarEstadoTodasSesiones(List<DtoShowQuestions> listaQuestions, bool nuevoEstado) async {
     try {
-      for (var sesion in _sesionFiltrada) {
-        Sesion estadoActualizador = Sesion(
+      for (var dto in listaQuestions) {
+        final sesion = mapDtoToSesion(dto);
+
+        Sesion sesionEstadoActualizador = Sesion(
           idSesion: sesion.idSesion,
           tipoRespuesta: sesion.tipoRespuesta,
           identifEncuesta: sesion.identifEncuesta,
@@ -2144,9 +2184,9 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
           rango: sesion.rango,
         );
 
-        final response = await ApiServiceSesion('https://10.0.2.2:7190').putSesion(sesion.idSesion!, estadoActualizador);
+        final response = await ApiServiceSesion('https://10.0.2.2:7190').putSesion(sesion.idSesion!, sesionEstadoActualizador);
 
-        if (estadoActualizador.estado) {
+        if (sesionEstadoActualizador.estado) {
           if (response.statusCode == 204) {
             sesion.estado = nuevoEstado;
             print('todas las secciones fue modificada con éxito');
@@ -2164,8 +2204,8 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
           }
         }
       }
-      _refreshSesion();
       _showSuccessDialog(context, 'Todas las secciones han sido ${nuevoEstado ? 'enviadas a la Encuesta' : 'deshabilitadas de la Encuesta'}');
+      _refreshSesion();
     } catch (e) {
       print('Error al actualizar todas las sesiones: $e');
       _showErrorDialog(context, 'Error al actualizar todas las sesiones');
@@ -2413,38 +2453,40 @@ class _SubPreguntasDataSource extends DataTableSource {
   int get selectedRowCount => 0;
 }
 
-class _SesionDataSource extends DataTableSource {
-  final List<Sesion> _sesionData;
-  final Function(Sesion) onEdit;
-  final Function(Sesion) onDelete;
-  final Function(Sesion) _estado;
+class _DtoShowQuestionsDataSource extends DataTableSource {
+  final List<DtoShowQuestions> _dtoShowQuestionsData;
+  final Function(DtoShowQuestions) onEdit;
+  final Function(DtoShowQuestions) onDelete;
+  final Function(DtoShowQuestions) _estado;
   final bool isTabletDevice;
 
-  _SesionDataSource(this._sesionData, this.onEdit, this.onDelete, this._estado, this.isTabletDevice);
+  _DtoShowQuestionsDataSource(this._dtoShowQuestionsData, this.onEdit, this.onDelete, this._estado, this.isTabletDevice);
 
   @override
   DataRow getRow(int index) {
-    if (index >= _sesionData.length) return const DataRow(cells: []);
+    if (index >= _dtoShowQuestionsData.length) return const DataRow(cells: []);
 
-    final section = _sesionData[index];
+    final section = _dtoShowQuestionsData[index];
 
     return DataRow(
       color: WidgetStateProperty.resolveWith<Color>((states) {
         // Color alterno para las filas
-        return (_sesionData.indexOf(section) % 2 == 0)
+        return (_dtoShowQuestionsData.indexOf(section) % 2 == 0)
               ? Colors.blueGrey.shade50
               : Colors.white;
       }),
       cells: [
-        DataCell(Text(section.idSesion.toString(), style: TextStyle(fontSize: isTabletDevice ? 9.5.sp : 12.sp))),
-        DataCell(Text(section.tipoRespuesta, style: TextStyle(fontSize: isTabletDevice ? 9.5.sp : 12.sp))),
-        DataCell(section.identifEncuesta != null ? Text(section.identifEncuesta!, style: TextStyle(fontSize: isTabletDevice ? 9.5.sp : 12.sp)) : const Text('')),
-        DataCell(Text(section.codPregunta.toString(), style: TextStyle(fontSize: isTabletDevice ? 9.5.sp : 12.sp))),
-        DataCell(section.codSubPregunta != null ? Text(section.codSubPregunta!, style: TextStyle(fontSize: isTabletDevice ? 9.5.sp : 12.sp)) : const Text('')),
-        DataCell(section.rango != null ? Text(section.rango!, style: TextStyle(fontSize: isTabletDevice ? 9.5.sp : 12.sp)) : const Text('')),
+        DataCell(Text(section.idSesionDto.toString(), style: TextStyle(fontSize: isTabletDevice ? 9.5.sp : 12.sp))),
+        DataCell(Text(section.tipoRespuestaDto, style: TextStyle(fontSize: isTabletDevice ? 9.5.sp : 12.sp))),
+        DataCell(section.identifEncuestaDto != null ? Text(section.identifEncuestaDto!, style: TextStyle(fontSize: isTabletDevice ? 9.5.sp : 12.sp)) : const Text('')),
+        DataCell(Text(section.codPreguntaDto.toString(), style: TextStyle(fontSize: isTabletDevice ? 9.5.sp : 12.sp))),
+        DataCell(Text(section.preguntaDto, style: TextStyle(fontSize: isTabletDevice ? 9.5.sp : 12.sp))),
+        DataCell(section.codSubPreguntaDto != null ? Text(section.codSubPreguntaDto!, style: TextStyle(fontSize: isTabletDevice ? 9.5.sp : 12.sp)) : const Text('')),
+        DataCell(section.subPreguntaDto != null ? Text(section.subPreguntaDto!, style: TextStyle(fontSize: isTabletDevice ? 9.5.sp : 12.sp)) : const Text('')),
+        DataCell(section.rangoDto != null ? Text(section.rangoDto!, style: TextStyle(fontSize: isTabletDevice ? 9.5.sp : 12.sp)) : const Text('')),
         DataCell(
           FlutterSwitch(
-            value: section.estado,
+            value: section.estadoDto,
             activeColor: Colors.green,
             inactiveColor: Colors.red,
             activeToggleColor: Colors.white,
@@ -2455,9 +2497,8 @@ class _SesionDataSource extends DataTableSource {
             inactiveIcon: const Icon(Icons.close, color: Colors.red),
             onToggle: (value) {
               print('Cambiando el estado a: $value');
-              section.estado = value;
+              section.estadoDto = value;
               _estado(section);
-              //notifyListeners(); // Notifica los cambios en la tabla
             },
             width: 120.0,
             height: isTabletDevice ? 27.5.h : 29.h,
@@ -2471,15 +2512,12 @@ class _SesionDataSource extends DataTableSource {
             children: [
               IconButton(
                 onPressed: () {
-                  // _showEditDialogSesion(section);
                   onEdit(section);
                 }, 
                 icon: const Icon(Icons.edit, color: Colors.blue),
-              ),
-              
+              ),      
               IconButton(
                 onPressed: () {
-                  // _showDeleteDialogSesion(section);
                   onDelete(section);
                 },
                 icon: const Icon(Icons.delete, color: Colors.red)
@@ -2495,7 +2533,7 @@ class _SesionDataSource extends DataTableSource {
   bool get isRowCountApproximate => false;
 
   @override
-  int get rowCount => _sesionData.length;
+  int get rowCount => _dtoShowQuestionsData.length;
 
   @override
   int get selectedRowCount => 0;

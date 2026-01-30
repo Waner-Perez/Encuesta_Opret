@@ -30,7 +30,7 @@ class DtoShowQuestions {
       preguntaDto: json['pregunta'],
       codSubPreguntaDto: json['codSubPregunta'],
       subPreguntaDto: json['subPregunta'],
-      estadoDto: json['estado'],
+      estadoDto: json['estado'] == 1 ? true : false,
       rangoDto: json['rango']
     );
   }
