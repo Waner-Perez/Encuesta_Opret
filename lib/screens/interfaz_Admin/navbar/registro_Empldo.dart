@@ -209,159 +209,161 @@ class _RegistroEmplState extends State<RegistroEmpl> {
               )
             ],
           ),
-          body: Column(
-            children: [
-              // Campo de entrada para búsqueda
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: FormBuilder(
-                  child: FormBuilderTextField(
-                    name: 'search',
-                    controller: searchController,
-                    style: const TextStyle(fontSize: 20.0),
-                    decoration: InputDecoration(
-                      labelText: 'Buscar Usuario aqui',
-                        labelStyle: const TextStyle(fontSize: 25.0, fontWeight: FontWeight.bold),
-                      hintStyle: const TextStyle(fontSize: 10),
-                      border: const OutlineInputBorder(),
-                      prefixIcon: const Icon(Icons.search),
-                      suffixIcon: searchController.text.isNotEmpty
-                        ? IconButton(
-                            icon: const Icon(Icons.clear),
-                            onPressed: _limpiarBusqueda,
-                          )
-                        : null
-                    ),
-                    onChanged: (value) {
-                      if (value != null && value.isNotEmpty) {
-                        _filtrarUsuarioPorId(value);
-                      } else {
-                        setState(() {
-                          usuariosFiltrados = null;
-                        });
-                      }
-                    },
-                  ),
-                ),
-              ),
-
-              // Mostrar detalles del usuario seleccionado
-              if (usuariosFiltrados != null) ...[
+          body: SafeArea(
+            child: Column(
+              children: [
+                // Campo de entrada para búsqueda
                 Padding(
                   padding: const EdgeInsets.all(16.0),
-                  child: Card(
-                    elevation: 10.0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30.0),
-                    ),
-                    color: const Color.fromARGB(255, 2, 37, 4), // Color de fondo de la tarjeta
-                    child: SizedBox(
-                      height: isTabletDevice ? null : 230.h,
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: isTabletDevice
-                          ? _buildUserDetails(isTabletDevice)
-                          : SingleChildScrollView(
-                              child: _buildUserDetails(isTabletDevice),
+                  child: FormBuilder(
+                    child: FormBuilderTextField(
+                      name: 'search',
+                      controller: searchController,
+                      style: const TextStyle(fontSize: 20.0),
+                      decoration: InputDecoration(
+                        labelText: 'Buscar Usuario aqui',
+                          labelStyle: const TextStyle(fontSize: 25.0, fontWeight: FontWeight.bold),
+                        hintStyle: const TextStyle(fontSize: 10),
+                        border: const OutlineInputBorder(),
+                        prefixIcon: const Icon(Icons.search),
+                        suffixIcon: searchController.text.isNotEmpty
+                          ? IconButton(
+                              icon: const Icon(Icons.clear),
+                              onPressed: _limpiarBusqueda,
                             )
+                          : null
+                      ),
+                      onChanged: (value) {
+                        if (value != null && value.isNotEmpty) {
+                          _filtrarUsuarioPorId(value);
+                        } else {
+                          setState(() {
+                            usuariosFiltrados = null;
+                          });
+                        }
+                      },
+                    ),
+                  ),
+                ),
+            
+                // Mostrar detalles del usuario seleccionado
+                if (usuariosFiltrados != null) ...[
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Card(
+                      elevation: 10.0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30.0),
+                      ),
+                      color: const Color.fromARGB(255, 2, 37, 4), // Color de fondo de la tarjeta
+                      child: SizedBox(
+                        height: isTabletDevice ? null : 230.h,
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: isTabletDevice
+                            ? _buildUserDetails(isTabletDevice)
+                            : SingleChildScrollView(
+                                child: _buildUserDetails(isTabletDevice),
+                              )
+                        ),
                       ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 20)
-              ],
-
-              Expanded(
-                child: FutureBuilder<List<Usuarios>>(
-                  future: _usuariosdata,
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting){
-                      return Center(
-                        // child: CircularProgressIndicator()
-                        child: Dialog(
-                          backgroundColor: Colors.transparent,
-                          child: Container(
-                            width: 200,
-                            height: 220,
-                            decoration: BoxDecoration(
-                              color: Colors.black.withOpacity(0.7),
-                              borderRadius: BorderRadius.circular(100),
-                            ),
-                            child: const Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                CircularProgressIndicator(
-                                        valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
-                                      ),
-                                SizedBox(height: 20),
-                                Text(
-                                  /*hasError ? 'Error' : */'Cargando...',
-                                  style: TextStyle(color: Colors.white, fontSize: 20),
-                                ),
-                              ],
-                            ),
-                          ),
-                        )
-                      );
-                    }else if (snapshot.hasError){
-                      print('Error al cargar los datos: ${snapshot.error}');
-                      return Center(child: Text('"Lo sentimos, no pudimos cargar la información en este momento. \nPor favo, inténtalo nuevamente presionando el (botón Refrescar)"', style: TextStyle(fontSize: isTabletDevice ? 11.sp : 9.sp, fontWeight: FontWeight.bold)));
-                    }else {
-                      final usuariostabla = snapshot.data ?? [];
-
-                      return SingleChildScrollView(
-                        child: Container(
-                          margin: const EdgeInsets.all(16.0),
-                          padding: const EdgeInsets.all(2.0),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            border: Border.all(color: const Color.fromARGB(255, 74, 71, 71)),
-                            borderRadius: BorderRadius.circular(10.0),
-                          ),
-                          child: Theme(
-                            data: Theme.of(context).copyWith(
-                              textTheme: Theme.of(context).textTheme.copyWith(
-                                bodySmall: TextStyle(
-                                  fontSize: isTabletDevice ? 20 : 15,           // Ajusta el tamaño del número
-                                  color: Colors.black,    // Cambia el color del texto (ajústalo según tu preferencia)
-                                  fontWeight: FontWeight.bold, // Hace el texto más visible
-                                ),
+                  const SizedBox(height: 20)
+                ],
+            
+                Expanded(
+                  child: FutureBuilder<List<Usuarios>>(
+                    future: _usuariosdata,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting){
+                        return Center(
+                          // child: CircularProgressIndicator()
+                          child: Dialog(
+                            backgroundColor: Colors.transparent,
+                            child: Container(
+                              width: 200,
+                              height: 220,
+                              decoration: BoxDecoration(
+                                color: Colors.black.withOpacity(0.7),
+                                borderRadius: BorderRadius.circular(100),
+                              ),
+                              child: const Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  CircularProgressIndicator(
+                                          valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
+                                        ),
+                                  SizedBox(height: 20),
+                                  Text(
+                                    /*hasError ? 'Error' : */'Cargando...',
+                                    style: TextStyle(color: Colors.white, fontSize: 20),
+                                  ),
+                                ],
                               ),
                             ),
-                            child: PaginatedDataTable(
-                              columns: [
-                                DataColumn(label: Text('ID', style: TextStyle(fontSize: isTabletDevice ? 27 : 15.sp, color: Colors.white, fontWeight: FontWeight.bold))),
-                                DataColumn(label: Text('Nombre Completo', style: TextStyle(fontSize: isTabletDevice ? 27 : 15.sp, color: Colors.white, fontWeight: FontWeight.bold))),
-                                DataColumn(label: Text('Usuario', style: TextStyle(fontSize: isTabletDevice ? 27 : 15.sp, color: Colors.white, fontWeight: FontWeight.bold))),
-                                DataColumn(label: Text('Correo Electronico', style: TextStyle(fontSize: isTabletDevice ? 27 : 15.sp, color: Colors.white, fontWeight: FontWeight.bold))),
-                                DataColumn(label: Text('Fecha de Creacion', style: TextStyle(fontSize: isTabletDevice ? 27 : 15.sp, color: Colors.white, fontWeight: FontWeight.bold))),
-                                DataColumn(label: Text('Rol', style: TextStyle(fontSize: isTabletDevice ? 27 : 15.sp, color: Colors.white, fontWeight: FontWeight.bold))),
-                                DataColumn(label: Text('Accion', style: TextStyle(fontSize: isTabletDevice ? 27 : 15.sp, color: Colors.white, fontWeight: FontWeight.bold)))
-                              ],
-                              source: _UsuariosDataSource(usuariostabla, _showEditDialog, _showDeleteDialog, _selectedRowIndex, isTabletDevice),
-                              rowsPerPage: isTabletDevice ? _filasPorPagina : 5, //numeros de filas
-                              columnSpacing: 30, //espacios entre columnas
-                              horizontalMargin: 50, //para aplicarle un margin horizontal a los campo de la tabla
-                              showCheckboxColumn: false, //oculta la columna de checkboxes
-                              headingRowColor: WidgetStateProperty.all<Color>(const Color.fromARGB(255, 2, 37, 4)), // Fondo de encabezado
-                              dataRowMinHeight: 60.0,  // Altura mínima de fila
-                              dataRowMaxHeight: 80.0,  // Altura máxima de fila
-                              showFirstLastButtons: true,
-                              onPageChanged: (index) {
-                                setState(() {
-                                  _paginaActual = index ~/ _filasPorPagina;
-                                });
-                              },
-                              initialFirstRowIndex: _paginaActual * _filasPorPagina,
+                          )
+                        );
+                      }else if (snapshot.hasError){
+                        print('Error al cargar los datos: ${snapshot.error}');
+                        return Center(child: Text('"Lo sentimos, no pudimos cargar la información en este momento. \nPor favo, inténtalo nuevamente presionando el (botón Refrescar)"', style: TextStyle(fontSize: isTabletDevice ? 11.sp : 9.sp, fontWeight: FontWeight.bold)));
+                      }else {
+                        final usuariostabla = snapshot.data ?? [];
+            
+                        return SingleChildScrollView(
+                          child: Container(
+                            margin: const EdgeInsets.all(16.0),
+                            padding: const EdgeInsets.all(2.0),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              border: Border.all(color: const Color.fromARGB(255, 74, 71, 71)),
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
+                            child: Theme(
+                              data: Theme.of(context).copyWith(
+                                textTheme: Theme.of(context).textTheme.copyWith(
+                                  bodySmall: TextStyle(
+                                    fontSize: isTabletDevice ? 20 : 15,           // Ajusta el tamaño del número
+                                    color: Colors.black,    // Cambia el color del texto (ajústalo según tu preferencia)
+                                    fontWeight: FontWeight.bold, // Hace el texto más visible
+                                  ),
+                                ),
+                              ),
+                              child: PaginatedDataTable(
+                                columns: [
+                                  DataColumn(label: Text('ID', style: TextStyle(fontSize: isTabletDevice ? 27 : 15.sp, color: Colors.white, fontWeight: FontWeight.bold))),
+                                  DataColumn(label: Text('Nombre Completo', style: TextStyle(fontSize: isTabletDevice ? 27 : 15.sp, color: Colors.white, fontWeight: FontWeight.bold))),
+                                  DataColumn(label: Text('Usuario', style: TextStyle(fontSize: isTabletDevice ? 27 : 15.sp, color: Colors.white, fontWeight: FontWeight.bold))),
+                                  DataColumn(label: Text('Correo Electronico', style: TextStyle(fontSize: isTabletDevice ? 27 : 15.sp, color: Colors.white, fontWeight: FontWeight.bold))),
+                                  DataColumn(label: Text('Fecha de Creacion', style: TextStyle(fontSize: isTabletDevice ? 27 : 15.sp, color: Colors.white, fontWeight: FontWeight.bold))),
+                                  DataColumn(label: Text('Rol', style: TextStyle(fontSize: isTabletDevice ? 27 : 15.sp, color: Colors.white, fontWeight: FontWeight.bold))),
+                                  DataColumn(label: Text('Accion', style: TextStyle(fontSize: isTabletDevice ? 27 : 15.sp, color: Colors.white, fontWeight: FontWeight.bold)))
+                                ],
+                                source: _UsuariosDataSource(usuariostabla, _showEditDialog, _showDeleteDialog, _selectedRowIndex, isTabletDevice),
+                                rowsPerPage: isTabletDevice ? _filasPorPagina : 5, //numeros de filas
+                                columnSpacing: 30, //espacios entre columnas
+                                horizontalMargin: 50, //para aplicarle un margin horizontal a los campo de la tabla
+                                showCheckboxColumn: false, //oculta la columna de checkboxes
+                                headingRowColor: WidgetStateProperty.all<Color>(const Color.fromARGB(255, 2, 37, 4)), // Fondo de encabezado
+                                dataRowMinHeight: 60.0,  // Altura mínima de fila
+                                dataRowMaxHeight: 80.0,  // Altura máxima de fila
+                                showFirstLastButtons: true,
+                                onPageChanged: (index) {
+                                  setState(() {
+                                    _paginaActual = index ~/ _filasPorPagina;
+                                  });
+                                },
+                                initialFirstRowIndex: _paginaActual * _filasPorPagina,
+                              ),
                             ),
                           ),
-                        ),
-                      );
+                        );
+                      }
                     }
-                  }
-                ),
-              )
-            ]
+                  ),
+                )
+              ]
+            ),
           ),
           floatingActionButton: Stack(
             children: [

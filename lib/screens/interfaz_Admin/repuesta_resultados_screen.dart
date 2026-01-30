@@ -194,203 +194,205 @@ class _RepuestaResultadosScreenState extends State<RepuestaResultadosScreen> {
           ],
         ),
       
-        body: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: FormBuilderDropdown<String>(
-                      name: 'filtrar', 
-                      initialValue: selectedFilter,
-                      style: const TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 1, 1, 1)),
-                      decoration: const InputDecoration(
-                        labelText: 'Filtrar por',
-                        labelStyle: TextStyle(fontSize: 30.0, fontWeight: FontWeight.bold), 
-                        border: OutlineInputBorder(),
+        body: SafeArea(
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: FormBuilderDropdown<String>(
+                        name: 'filtrar', 
+                        initialValue: selectedFilter,
+                        style: const TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 1, 1, 1)),
+                        decoration: const InputDecoration(
+                          labelText: 'Filtrar por',
+                          labelStyle: TextStyle(fontSize: 30.0, fontWeight: FontWeight.bold), 
+                          border: OutlineInputBorder(),
+                        ),
+                        items: [
+                          'ID del Usuario', 
+                          // 'Cedula de Identidad',
+                          'Usuarios', 
+                          'Nombre y Apellido', 
+                          'Número de Encuesta',
+                          'Número de Seccion',
+                          'Número de Pregunta',
+                          'Número de Sub-Pregunta',
+                          'Por Linea',
+                          'Por Estación'
+                        ].map((filter) => DropdownMenuItem(
+                            value: filter,
+                            child: Text(filter)
+                        )).toList(),
+                        onChanged: (value) => setState(() {
+                          selectedFilter = value!;
+                        })
                       ),
-                      items: [
-                        'ID del Usuario', 
-                        // 'Cedula de Identidad',
-                        'Usuarios', 
-                        'Nombre y Apellido', 
-                        'Número de Encuesta',
-                        'Número de Seccion',
-                        'Número de Pregunta',
-                        'Número de Sub-Pregunta',
-                        'Por Linea',
-                        'Por Estación'
-                      ].map((filter) => DropdownMenuItem(
-                          value: filter,
-                          child: Text(filter)
-                      )).toList(),
-                      onChanged: (value) => setState(() {
-                        selectedFilter = value!;
-                      })
                     ),
-                  ),
-                  const SizedBox(width: 16.0),
-                  Expanded(
-                    flex: 2,
-                    child: FormBuilderTextField(
-                      name: 'search',
-                      controller: searchController,
-                      style: const TextStyle(fontSize: 20.0),
-                      decoration: InputDecoration( 
-                        labelText: 'Buscar', 
-                        labelStyle: const TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold), 
-                        border: const OutlineInputBorder(),
-                        prefixIcon: const Icon(Icons.search),
-                        suffixIcon: searchController.text.isNotEmpty
-                          ? IconButton(
-                              icon: const Icon(Icons.clear),
-                              onPressed: _limpiarBusqueda,
-                            )
-                          : null 
+                    const SizedBox(width: 16.0),
+                    Expanded(
+                      flex: 2,
+                      child: FormBuilderTextField(
+                        name: 'search',
+                        controller: searchController,
+                        style: const TextStyle(fontSize: 20.0),
+                        decoration: InputDecoration( 
+                          labelText: 'Buscar', 
+                          labelStyle: const TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold), 
+                          border: const OutlineInputBorder(),
+                          prefixIcon: const Icon(Icons.search),
+                          suffixIcon: searchController.text.isNotEmpty
+                            ? IconButton(
+                                icon: const Icon(Icons.clear),
+                                onPressed: _limpiarBusqueda,
+                              )
+                            : null 
+                        ),
+                        onChanged: (value) { 
+                          if (value!.isNotEmpty) { 
+                            _filtrarRespuestas(value); 
+                          } else { 
+                            setState(() { 
+                              respuestasFiltrados = []; 
+                            }); 
+                          } 
+                        },
                       ),
-                      onChanged: (value) { 
-                        if (value!.isNotEmpty) { 
-                          _filtrarRespuestas(value); 
-                        } else { 
-                          setState(() { 
-                            respuestasFiltrados = []; 
-                          }); 
-                        } 
-                      },
                     ),
-                  ),
-                ],
-              )
-            ),
-            Expanded(
-              child: FutureBuilder<List<SpFiltrarRespuestas>>(
-                future: _respuestaData,
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting){
-                    return Dialog(
-                      backgroundColor: const Color.fromARGB(255, 56, 56, 56),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(100)),
-                      child: const Padding(
-                        padding: EdgeInsets.all(20.0),
-                        child: SizedBox(
-                          width: 90,
-                          height: 130,
-                          child: Center(
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                CircularProgressIndicator(valueColor: AlwaysStoppedAnimation(Colors.green)),
-                                SizedBox(height: 20),
-                                Text(
-                                  'Cargando...',
-                                  style: TextStyle(fontSize: 18, color: Colors.white)
-                                ),
-                              ],
+                  ],
+                )
+              ),
+              Expanded(
+                child: FutureBuilder<List<SpFiltrarRespuestas>>(
+                  future: _respuestaData,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting){
+                      return Dialog(
+                        backgroundColor: const Color.fromARGB(255, 56, 56, 56),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(100)),
+                        child: const Padding(
+                          padding: EdgeInsets.all(20.0),
+                          child: SizedBox(
+                            width: 90,
+                            height: 130,
+                            child: Center(
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  CircularProgressIndicator(valueColor: AlwaysStoppedAnimation(Colors.green)),
+                                  SizedBox(height: 20),
+                                  Text(
+                                    'Cargando...',
+                                    style: TextStyle(fontSize: 18, color: Colors.white)
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    );
-                  }else if (snapshot.hasError){
-                    print('Error al cargar los datos de las respuestas: ${snapshot.error}');
-                    return Center(child: Text('"Lo sentimos, no pudimos cargar la información en este momento. \nPor favo, inténtalo nuevamente presionando el (botón Refrescar)"', style: TextStyle(fontSize: isTabletDevice ? 11.sp : 9.sp)));
-                  } else {
-                    final answerData = respuestasFiltrados.isNotEmpty
-                        ? respuestasFiltrados
-                        : snapshot.data ?? [];
-      
-                    return SingleChildScrollView(
-                      child: Theme(
-                        data: Theme.of(context).copyWith(
-                          textTheme: Theme.of(context).textTheme.copyWith(
-                            bodySmall: TextStyle(
-                              fontSize: isTabletDevice ? 9.sp : 9.sp,          // Ajusta el tamaño del número
-                              color: Colors.black,    // Cambia el color del texto (ajústalo según tu preferencia)
-                              fontWeight: FontWeight.bold, // Hace el texto más visible
+                      );
+                    }else if (snapshot.hasError){
+                      print('Error al cargar los datos de las respuestas: ${snapshot.error}');
+                      return Center(child: Text('"Lo sentimos, no pudimos cargar la información en este momento. \nPor favo, inténtalo nuevamente presionando el (botón Refrescar)"', style: TextStyle(fontSize: isTabletDevice ? 11.sp : 9.sp)));
+                    } else {
+                      final answerData = respuestasFiltrados.isNotEmpty
+                          ? respuestasFiltrados
+                          : snapshot.data ?? [];
+                
+                      return SingleChildScrollView(
+                        child: Theme(
+                          data: Theme.of(context).copyWith(
+                            textTheme: Theme.of(context).textTheme.copyWith(
+                              bodySmall: TextStyle(
+                                fontSize: isTabletDevice ? 9.sp : 9.sp,          // Ajusta el tamaño del número
+                                color: Colors.black,    // Cambia el color del texto (ajústalo según tu preferencia)
+                                fontWeight: FontWeight.bold, // Hace el texto más visible
+                              ),
                             ),
                           ),
+                          child: PaginatedDataTable(
+                            header: const Text('Reporte de las Respuesta'),
+                            columns: [
+                              DataColumn(label: Text('ID del Usuario', style: TextStyle(fontSize: isTabletDevice ? 12.sp : 12.sp))),
+                              DataColumn(label: Text('Nombre y Apellido', style: TextStyle(fontSize: isTabletDevice ? 12.sp : 12.sp))),
+                              DataColumn(label: Text('Usuarios', style: TextStyle(fontSize: isTabletDevice ? 12.sp : 12.sp))),
+                              DataColumn(label: Text('No. Encuesta', style: TextStyle(fontSize: isTabletDevice ? 12.sp : 12.sp))),
+                              DataColumn(label: Text('No. Sección', style: TextStyle(fontSize: isTabletDevice ? 12.sp : 12.sp))),
+                              DataColumn(label: Text('No. Pregunta', style: TextStyle(fontSize: isTabletDevice ? 12.sp : 12.sp))),
+                              DataColumn(label: Text('Pregunta', style: TextStyle(fontSize: isTabletDevice ? 12.sp : 12.sp))),
+                              DataColumn(label: Text('No. Sub-Pregunta', style: TextStyle(fontSize: isTabletDevice ? 12.sp : 12.sp))),
+                              DataColumn(label: Text('Sub-Pregunta', style: TextStyle(fontSize: isTabletDevice ? 12.sp : 12.sp))),
+                              DataColumn(label: Text('Hora Respondida', style: TextStyle(fontSize: isTabletDevice ? 12.sp : 12.sp))),
+                              DataColumn(label: Text('Respuesta', style: TextStyle(fontSize: isTabletDevice ? 12.sp : 12.sp))),
+                              DataColumn(label: Text('Comentarios', style: TextStyle(fontSize: isTabletDevice ? 12.sp : 12.sp))),
+                              DataColumn(label: Text('Justificacion', style: TextStyle(fontSize: isTabletDevice ? 12.sp : 12.sp))),
+                              DataColumn(label: Text('Linea del Metro', style: TextStyle(fontSize: isTabletDevice ? 12.sp : 12.sp))),
+                              DataColumn(label: Text('Estación del Metro', style: TextStyle(fontSize: isTabletDevice ? 12.sp : 12.sp))),
+                            ], 
+                            source: RespuestasDataSource(answerData, isTabletDevice),
+                            rowsPerPage: 5, //numeros de filas
+                            columnSpacing: 30, //espacios entre columnas
+                            horizontalMargin: 50, //para aplicarle un margin horizontal a los campo de la tabla
+                            showCheckboxColumn: false, //oculta la columna de checkboxes
+                            headingRowColor: WidgetStateProperty.all(Colors.grey[400]), //color del encabezado
+                            dataRowMinHeight: 60.0,  // Altura mínima de fila
+                            dataRowMaxHeight: 80.0,  // Altura máxima de fila
+                            showFirstLastButtons: true,     
+                          ),
                         ),
-                        child: PaginatedDataTable(
-                          header: const Text('Reporte de las Respuesta'),
-                          columns: [
-                            DataColumn(label: Text('ID del Usuario', style: TextStyle(fontSize: isTabletDevice ? 12.sp : 12.sp))),
-                            DataColumn(label: Text('Nombre y Apellido', style: TextStyle(fontSize: isTabletDevice ? 12.sp : 12.sp))),
-                            DataColumn(label: Text('Usuarios', style: TextStyle(fontSize: isTabletDevice ? 12.sp : 12.sp))),
-                            DataColumn(label: Text('No. Encuesta', style: TextStyle(fontSize: isTabletDevice ? 12.sp : 12.sp))),
-                            DataColumn(label: Text('No. Sección', style: TextStyle(fontSize: isTabletDevice ? 12.sp : 12.sp))),
-                            DataColumn(label: Text('No. Pregunta', style: TextStyle(fontSize: isTabletDevice ? 12.sp : 12.sp))),
-                            DataColumn(label: Text('Pregunta', style: TextStyle(fontSize: isTabletDevice ? 12.sp : 12.sp))),
-                            DataColumn(label: Text('No. Sub-Pregunta', style: TextStyle(fontSize: isTabletDevice ? 12.sp : 12.sp))),
-                            DataColumn(label: Text('Sub-Pregunta', style: TextStyle(fontSize: isTabletDevice ? 12.sp : 12.sp))),
-                            DataColumn(label: Text('Hora Respondida', style: TextStyle(fontSize: isTabletDevice ? 12.sp : 12.sp))),
-                            DataColumn(label: Text('Respuesta', style: TextStyle(fontSize: isTabletDevice ? 12.sp : 12.sp))),
-                            DataColumn(label: Text('Comentarios', style: TextStyle(fontSize: isTabletDevice ? 12.sp : 12.sp))),
-                            DataColumn(label: Text('Justificacion', style: TextStyle(fontSize: isTabletDevice ? 12.sp : 12.sp))),
-                            DataColumn(label: Text('Linea del Metro', style: TextStyle(fontSize: isTabletDevice ? 12.sp : 12.sp))),
-                            DataColumn(label: Text('Estación del Metro', style: TextStyle(fontSize: isTabletDevice ? 12.sp : 12.sp))),
-                          ], 
-                          source: RespuestasDataSource(answerData, isTabletDevice),
-                          rowsPerPage: isTabletDevice ? 7 : 5, //numeros de filas
-                          columnSpacing: 30, //espacios entre columnas
-                          horizontalMargin: 50, //para aplicarle un margin horizontal a los campo de la tabla
-                          showCheckboxColumn: false, //oculta la columna de checkboxes
-                          headingRowColor: WidgetStateProperty.all(Colors.grey[400]), //color del encabezado
-                          dataRowMinHeight: 60.0,  // Altura mínima de fila
-                          dataRowMaxHeight: 80.0,  // Altura máxima de fila
-                          showFirstLastButtons: true,     
-                        ),
-                      ),
-                    );
+                      );
+                    }
                   }
-                }
+                ),
               ),
-            ),
-            //boton para mostrar los graficos
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () {
-                        _showView(context, 'Ver los resultado de las respuesta en Gráficas');
-                      },
-                      style: ElevatedButton.styleFrom(
-                          foregroundColor: Colors.white,
-                          backgroundColor: Colors.blue,
-                        textStyle: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(50),
-                        )
-                      ),
-                      child: const Text('Ver gráfica')
+              //boton para mostrar los graficos
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          _showView(context, 'Ver los resultado de las respuesta en Gráficas');
+                        },
+                        style: ElevatedButton.styleFrom(
+                            foregroundColor: Colors.white,
+                            backgroundColor: Colors.blue,
+                          textStyle: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(50),
+                          )
+                        ),
+                        child: const Text('Ver gráfica')
+                      )
+                    ),
+                    const SizedBox(width: 20),
+          
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          _showDownload(context, "¿Deseas descargar los reportes de Respustas y Formularios en formato .csv?\n\nDebe de esperar un poco. En breve aparecerá el reporte en Excel.", report);
+                        },
+                        style: ElevatedButton.styleFrom(
+                            foregroundColor: Colors.white,
+                            backgroundColor: const Color.fromARGB(255, 11, 209, 7),
+                          textStyle: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(50),
+                          )
+                        ),
+                        child: const Text('Exportar')
+                      )
                     )
-                  ),
-                  const SizedBox(width: 20),
-
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () {
-                        _showDownload(context, "¿Deseas descargar los reportes de Respustas y Formularios en formato .csv?\n\nDebe de esperar un poco. En breve aparecerá el reporte en Excel.", report);
-                      },
-                      style: ElevatedButton.styleFrom(
-                          foregroundColor: Colors.white,
-                          backgroundColor: const Color.fromARGB(255, 11, 209, 7),
-                        textStyle: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(50),
-                        )
-                      ),
-                      child: const Text('Exportar')
-                    )
-                  )
-                ],
-              ),
-            )
-          ]
+                  ],
+                ),
+              )
+            ]
+          ),
         )
       ),
     );

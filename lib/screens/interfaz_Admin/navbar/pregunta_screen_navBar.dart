@@ -225,6 +225,23 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
   }
 
   // Método para ordenar las secciones por estado mientras sea true estas estarán arriba
+  // void _sortSectionByState(List<DtoShowQuestions> lista){
+  //   lista.sort((a, b) {
+  //     if (a.estadoDto != b.estadoDto) return a.estadoDto ? -1 : 1;
+      
+  //     // Prioridad 2: identifEncuestaDto (menor a mayor)
+  //     final valA = a.identifEncuestaDto;
+  //     final valB = b.identifEncuestaDto;
+
+  //     if (valA == null && valB == null) return 0;
+  //     if (valA == null) return 1;   // nulls al final
+  //     if (valB == null) return -1;
+      
+  //     // Si no son números → orden alfabético
+  //     return valA.compareTo(valB);
+  //   });
+  // }
+
   void _sortSectionByState(List<DtoShowQuestions> lista){
     lista.sort((a, b) {
       if (a.estadoDto != b.estadoDto) return a.estadoDto ? -1 : 1;
@@ -278,34 +295,92 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
             ],
           ),
 
-          body: Stack(
-            children: [
-              // Cuerpo principal con las tablas
-              SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Tablas de Preguntas',
-                        style: TextStyle(fontSize: 23, fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 20),
-
-                      (isTabletDevice)
-                        ? Row(
-                            children: [
-                              Expanded(
-                                child: FormBuilderDropdown<String>(
+          body: SafeArea(
+            child: Stack(
+              children: [
+                // Cuerpo principal con las tablas
+                SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Tablas de Preguntas',
+                          style: TextStyle(fontSize: 23, fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 20),
+            
+                        (isTabletDevice)
+                          ? Row(
+                              children: [
+                                Expanded(
+                                  child: FormBuilderDropdown<String>(
+                                    name: 'filtrarPregunta',
+                                    menuMaxHeight: 400.0, // Altura máxima del cuadro desplegable
+                                    initialValue: selectedFilterPregunta,
+                                    style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 1, 1, 1)),
+                                    decoration: const InputDecoration(
+                                      labelText: 'Filtrar por',
+                                      labelStyle: TextStyle(fontSize: 25.0, fontWeight: FontWeight.bold),
+                                      border: OutlineInputBorder(),
+                                    ),
+                                    items: [
+                                      'No de pregunta',
+                                      'Pregunta'
+                                    ].map((filter) => DropdownMenuItem(
+                                      value: filter,
+                                      child: Text(filter),
+                                    )).toList(),
+                                    onChanged: (value) => setState(() {
+                                      selectedFilterPregunta = value!;
+                                    }),
+                                  ),
+                                ),
+                                const SizedBox(width: 16),
+            
+                                Expanded(
+                                  flex: 2,
+                                  child: FormBuilderTextField(
+                                    name: 'searchPregunta',
+                                    controller: searchPreguntaController,
+                                    style: const TextStyle(fontSize: 15.0),
+                                    decoration: InputDecoration(
+                                        labelText: 'Buscar',
+                                        labelStyle: const TextStyle(fontSize: 25.0, fontWeight: FontWeight.bold),
+                                        border: const OutlineInputBorder(),
+                                        prefixIcon: const Icon(Icons.search),
+                                        suffixIcon: searchPreguntaController.text.isNotEmpty
+                                            ? IconButton(
+                                          icon: const Icon(Icons.clear),
+                                          onPressed: _limpiarBusqueda,
+                                        )
+                                            : null
+                                    ),
+                                    onChanged: (value) {
+                                      if (value!.isNotEmpty) {
+                                        _filtrarPreguntas(value);
+                                      } else {
+                                        setState(() {
+                                          _preguntaFiltrada = [];
+                                        });
+                                      }
+                                    },
+                                  )
+                                )
+                              ],
+                            )
+                          : Column(
+                              children: [
+                                FormBuilderDropdown<String>(
                                   name: 'filtrarPregunta',
                                   menuMaxHeight: 400.0, // Altura máxima del cuadro desplegable
                                   initialValue: selectedFilterPregunta,
-                                  style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 1, 1, 1)),
-                                  decoration: const InputDecoration(
+                                  style: isTabletDevice ?  TextStyle(fontSize: 15.sp, fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 1, 1, 1)) : TextStyle(fontSize: 15.sp, fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 1, 1, 1)),
+                                  decoration: InputDecoration(
                                     labelText: 'Filtrar por',
-                                    labelStyle: TextStyle(fontSize: 25.0, fontWeight: FontWeight.bold),
-                                    border: OutlineInputBorder(),
+                                    labelStyle: TextStyle(fontSize: isTabletDevice ? null : 15.sp, fontWeight: FontWeight.bold),
+                                    border: const OutlineInputBorder(),
                                   ),
                                   items: [
                                     'No de pregunta',
@@ -318,25 +393,22 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                                     selectedFilterPregunta = value!;
                                   }),
                                 ),
-                              ),
-                              const SizedBox(width: 16),
-
-                              Expanded(
-                                flex: 2,
-                                child: FormBuilderTextField(
+                                const SizedBox(height: 16),
+            
+                                FormBuilderTextField(
                                   name: 'searchPregunta',
                                   controller: searchPreguntaController,
-                                  style: const TextStyle(fontSize: 15.0),
+                                  style: const TextStyle(fontSize: 15),
                                   decoration: InputDecoration(
                                       labelText: 'Buscar',
-                                      labelStyle: const TextStyle(fontSize: 25.0, fontWeight: FontWeight.bold),
+                                      labelStyle: const TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
                                       border: const OutlineInputBorder(),
                                       prefixIcon: const Icon(Icons.search),
                                       suffixIcon: searchPreguntaController.text.isNotEmpty
                                           ? IconButton(
-                                        icon: const Icon(Icons.clear),
-                                        onPressed: _limpiarBusqueda,
-                                      )
+                                              icon: const Icon(Icons.clear),
+                                              onPressed: _limpiarBusqueda,
+                                            )
                                           : null
                                   ),
                                   onChanged: (value) {
@@ -349,172 +421,172 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                                     }
                                   },
                                 )
-                              )
-                            ],
-                          )
-                        : Column(
-                            children: [
-                              FormBuilderDropdown<String>(
-                                name: 'filtrarPregunta',
-                                menuMaxHeight: 400.0, // Altura máxima del cuadro desplegable
-                                initialValue: selectedFilterPregunta,
-                                style: isTabletDevice ?  TextStyle(fontSize: 15.sp, fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 1, 1, 1)) : TextStyle(fontSize: 15.sp, fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 1, 1, 1)),
-                                decoration: InputDecoration(
-                                  labelText: 'Filtrar por',
-                                  labelStyle: TextStyle(fontSize: isTabletDevice ? null : 15.sp, fontWeight: FontWeight.bold),
-                                  border: const OutlineInputBorder(),
+                              ],
+                            ),
+            
+                        const SizedBox(height: 20),
+                        const Divider(),
+            
+                        FutureBuilder<List<Preguntas>>(
+                          future: _preguntasData,
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              return const Center(child: CircularProgressIndicator());
+                            }else if(snapshot.hasError) {
+                              print('Error al cargar la Preguntas: ${snapshot.error}');
+                              return Center(child: Text('"Lo sentimos, no pudimos cargar la información en este momento. \nPor favo, inténtalo nuevamente presionando el (botón Refrescar)"', style: TextStyle(fontSize: isTabletDevice ? 11.sp : 9.sp, fontWeight: FontWeight.bold)));
+                            }else {
+                              final questionTable = _preguntaFiltrada.isNotEmpty
+                                    ? _preguntaFiltrada
+                                    : snapshot.data ?? [];
+            
+                              return Container(
+                                margin: const EdgeInsets.all(2.0),
+                                padding: const EdgeInsets.all(2.0),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  border: Border.all(color: const Color.fromARGB(255, 74, 71, 71)),
+                                  borderRadius: BorderRadius.circular(10.0),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: const Color.fromARGB(255, 9, 9, 9).withOpacity(0.5),
+                                      spreadRadius: 2,
+                                      blurRadius: 7,
+                                      offset: const Offset(0, 3),
+                                    )
+                                  ]
                                 ),
-                                items: [
-                                  'No de pregunta',
-                                  'Pregunta'
-                                ].map((filter) => DropdownMenuItem(
-                                  value: filter,
-                                  child: Text(filter),
-                                )).toList(),
-                                onChanged: (value) => setState(() {
-                                  selectedFilterPregunta = value!;
-                                }),
-                              ),
-                              const SizedBox(height: 16),
-
-                              FormBuilderTextField(
-                                name: 'searchPregunta',
-                                controller: searchPreguntaController,
-                                style: const TextStyle(fontSize: 15),
-                                decoration: InputDecoration(
-                                    labelText: 'Buscar',
-                                    labelStyle: const TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
-                                    border: const OutlineInputBorder(),
-                                    prefixIcon: const Icon(Icons.search),
-                                    suffixIcon: searchPreguntaController.text.isNotEmpty
-                                        ? IconButton(
+                                child: Theme(
+                                  data: Theme.of(context).copyWith(
+                                    textTheme: Theme.of(context).textTheme.copyWith(
+                                      bodySmall: TextStyle(
+                                        fontSize: isTabletDevice ? 9.sp : 9.sp,           // Ajusta el tamaño del número
+                                        color: Colors.black,    // Cambia el color del texto (ajústalo según tu preferencia)
+                                        fontWeight: FontWeight.bold, // Hace el texto más visible
+                                      ),
+                                    ),
+                                  ),
+                                  child: PaginatedDataTable(
+                                    columns: [
+                                      DataColumn(label: Text('No', style: TextStyle(fontSize: isTabletDevice ? 12.sp : 12.sp, color: Colors.white, fontWeight: FontWeight.bold))),
+                                      DataColumn(label: Text('Preguntas', style: TextStyle(fontSize: isTabletDevice ? 12.sp : 12.sp, color: Colors.white, fontWeight: FontWeight.bold))),
+                                      DataColumn(label: Text('Accion', style: TextStyle(fontSize: isTabletDevice ? 12.sp : 12.sp, color: Colors.white, fontWeight: FontWeight.bold)))
+                                    ],
+                                    source: _PreguntasDataSource(questionTable, _showEditDialog, _showDeleteDialog, isTabletDevice),
+                                    headingRowColor: WidgetStateProperty.all<Color>(const Color.fromARGB(255, 2, 37, 4)), // Fondo de encabezado
+                                    rowsPerPage: 7, //numeros de filas
+                                    columnSpacing: 50, //espacios entre columnas
+                                    horizontalMargin: 60, //para aplicarle un margin horizontal a los campo de la tabla
+                                    showCheckboxColumn: false, //oculta la columna de checkboxes
+                                    dataRowMinHeight: 50.0,  // Altura mínima de fila
+                                    dataRowMaxHeight: 80.0,  // Altura máxima de fila
+                                    showFirstLastButtons: true,
+                                  ),
+                                ),
+                              );
+                            }
+                          }
+                        ),
+                        const Divider(),
+            
+                        const SizedBox(height: 20),
+                        const Text(
+                          'Tablas de Sub Preguntas',
+                          style: TextStyle(fontSize: 23, fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 20),
+            
+                        (isTabletDevice)
+                          ? Row(
+                              children: [
+                                Expanded(
+                                  child: FormBuilderDropdown<String>(
+                                    name: 'filtrarSubPregunta',
+                                    menuMaxHeight: 400.0, // Altura máxima del cuadro desplegable
+                                    initialValue: selectedFilterSubPregunta,
+                                    style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 1, 1, 1)),
+                                    decoration: const InputDecoration(
+                                      labelText: 'Filtrar por',
+                                      labelStyle: TextStyle(fontSize: 25.0, fontWeight: FontWeight.bold),
+                                      border: OutlineInputBorder(),
+                                    ),
+                                    items: [
+                                      'Id de Sub pregunta',
+                                      'Sup Pregunta',
+                                    ].map((filter) => DropdownMenuItem(
+                                      value: filter,
+                                      child: Text(filter),
+                                    )).toList(),
+                                    onChanged: (value) => setState(() {
+                                      selectedFilterSubPregunta = value!;
+                                    }),
+                                  ),
+                                ),
+                                const SizedBox(width: 16),
+            
+                                Expanded(
+                                    flex: 2,
+                                    child: FormBuilderTextField(
+                                      name: 'searchSubPregunta',
+                                      controller: searchSubPreguntaController,
+                                      style: const TextStyle(fontSize: 15),
+                                      decoration: InputDecoration(
+                                          labelText: 'Buscar',
+                                          labelStyle: const TextStyle(fontSize: 25.0, fontWeight: FontWeight.bold),
+                                          border: const OutlineInputBorder(),
+                                          prefixIcon: const Icon(Icons.search),
+                                          suffixIcon: searchSubPreguntaController.text.isNotEmpty
+                                              ? IconButton(
                                             icon: const Icon(Icons.clear),
                                             onPressed: _limpiarBusqueda,
                                           )
-                                        : null
-                                ),
-                                onChanged: (value) {
-                                  if (value!.isNotEmpty) {
-                                    _filtrarPreguntas(value);
-                                  } else {
-                                    setState(() {
-                                      _preguntaFiltrada = [];
-                                    });
-                                  }
-                                },
-                              )
-                            ],
-                          ),
-
-                      const SizedBox(height: 20),
-                      const Divider(),
-
-                      FutureBuilder<List<Preguntas>>(
-                        future: _preguntasData,
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState == ConnectionState.waiting) {
-                            return const Center(child: CircularProgressIndicator());
-                          }else if(snapshot.hasError) {
-                            print('Error al cargar la Preguntas: ${snapshot.error}');
-                            return Center(child: Text('"Lo sentimos, no pudimos cargar la información en este momento. \nPor favo, inténtalo nuevamente presionando el (botón Refrescar)"', style: TextStyle(fontSize: isTabletDevice ? 11.sp : 9.sp, fontWeight: FontWeight.bold)));
-                          }else {
-                            final questionTable = _preguntaFiltrada.isNotEmpty
-                                  ? _preguntaFiltrada
-                                  : snapshot.data ?? [];
-
-                            return Container(
-                              margin: const EdgeInsets.all(2.0),
-                              padding: const EdgeInsets.all(2.0),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                border: Border.all(color: const Color.fromARGB(255, 74, 71, 71)),
-                                borderRadius: BorderRadius.circular(10.0),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: const Color.fromARGB(255, 9, 9, 9).withOpacity(0.5),
-                                    spreadRadius: 2,
-                                    blurRadius: 7,
-                                    offset: const Offset(0, 3),
-                                  )
-                                ]
-                              ),
-                              child: Theme(
-                                data: Theme.of(context).copyWith(
-                                  textTheme: Theme.of(context).textTheme.copyWith(
-                                    bodySmall: TextStyle(
-                                      fontSize: isTabletDevice ? 9.sp : 9.sp,           // Ajusta el tamaño del número
-                                      color: Colors.black,    // Cambia el color del texto (ajústalo según tu preferencia)
-                                      fontWeight: FontWeight.bold, // Hace el texto más visible
+                                              : null
+                                      ),
+                                      onChanged: (value) {
+                                        if (value!.isNotEmpty) {
+                                          _filtrarSubPreguntas(value);
+                                        } else {
+                                          setState(() {
+                                            _subPreguntaFiltrada = [];
+                                          });
+                                        }
+                                      },
+                                    )
+                                )
+                              ],
+                            )
+                            : Column(
+                                children: [
+                                  FormBuilderDropdown<String>(
+                                    name: 'filtrarSubPregunta',
+                                    menuMaxHeight: 400.0, // Altura máxima del cuadro desplegable
+                                    initialValue: selectedFilterSubPregunta,
+                                    style: isTabletDevice ?  null  : TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 1, 1, 1)),
+                                    decoration: InputDecoration(
+                                      labelText: 'Filtrar por',
+                                      labelStyle: TextStyle(fontSize: isTabletDevice ? null : 15.sp, fontWeight: FontWeight.bold),
+                                      border: const OutlineInputBorder(),
                                     ),
+                                    items: [
+                                      'Id de Sub pregunta',
+                                      'Sup Pregunta',
+                                    ].map((filter) => DropdownMenuItem(
+                                      value: filter,
+                                      child: Text(filter),
+                                    )).toList(),
+                                    onChanged: (value) => setState(() {
+                                      selectedFilterSubPregunta = value!;
+                                    }),
                                   ),
-                                ),
-                                child: PaginatedDataTable(
-                                  columns: [
-                                    DataColumn(label: Text('No', style: TextStyle(fontSize: isTabletDevice ? 12.sp : 12.sp, color: Colors.white, fontWeight: FontWeight.bold))),
-                                    DataColumn(label: Text('Preguntas', style: TextStyle(fontSize: isTabletDevice ? 12.sp : 12.sp, color: Colors.white, fontWeight: FontWeight.bold))),
-                                    DataColumn(label: Text('Accion', style: TextStyle(fontSize: isTabletDevice ? 12.sp : 12.sp, color: Colors.white, fontWeight: FontWeight.bold)))
-                                  ],
-                                  source: _PreguntasDataSource(questionTable, _showEditDialog, _showDeleteDialog, isTabletDevice),
-                                  headingRowColor: WidgetStateProperty.all<Color>(const Color.fromARGB(255, 2, 37, 4)), // Fondo de encabezado
-                                  rowsPerPage: 7, //numeros de filas
-                                  columnSpacing: 50, //espacios entre columnas
-                                  horizontalMargin: 60, //para aplicarle un margin horizontal a los campo de la tabla
-                                  showCheckboxColumn: false, //oculta la columna de checkboxes
-                                  dataRowMinHeight: 50.0,  // Altura mínima de fila
-                                  dataRowMaxHeight: 80.0,  // Altura máxima de fila
-                                  showFirstLastButtons: true,
-                                ),
-                              ),
-                            );
-                          }
-                        }
-                      ),
-                      const Divider(),
-
-                      const SizedBox(height: 20),
-                      const Text(
-                        'Tablas de Sub Preguntas',
-                        style: TextStyle(fontSize: 23, fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 20),
-
-                      (isTabletDevice)
-                        ? Row(
-                            children: [
-                              Expanded(
-                                child: FormBuilderDropdown<String>(
-                                  name: 'filtrarSubPregunta',
-                                  menuMaxHeight: 400.0, // Altura máxima del cuadro desplegable
-                                  initialValue: selectedFilterSubPregunta,
-                                  style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 1, 1, 1)),
-                                  decoration: const InputDecoration(
-                                    labelText: 'Filtrar por',
-                                    labelStyle: TextStyle(fontSize: 25.0, fontWeight: FontWeight.bold),
-                                    border: OutlineInputBorder(),
-                                  ),
-                                  items: [
-                                    'Id de Sub pregunta',
-                                    'Sup Pregunta',
-                                  ].map((filter) => DropdownMenuItem(
-                                    value: filter,
-                                    child: Text(filter),
-                                  )).toList(),
-                                  onChanged: (value) => setState(() {
-                                    selectedFilterSubPregunta = value!;
-                                  }),
-                                ),
-                              ),
-                              const SizedBox(width: 16),
-
-                              Expanded(
-                                  flex: 2,
-                                  child: FormBuilderTextField(
+                                  const SizedBox(height: 16),
+            
+                                  FormBuilderTextField(
                                     name: 'searchSubPregunta',
                                     controller: searchSubPreguntaController,
-                                    style: const TextStyle(fontSize: 15),
+                                    style: const TextStyle(fontSize: 20.0),
                                     decoration: InputDecoration(
                                         labelText: 'Buscar',
-                                        labelStyle: const TextStyle(fontSize: 25.0, fontWeight: FontWeight.bold),
+                                        labelStyle: const TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
                                         border: const OutlineInputBorder(),
                                         prefixIcon: const Icon(Icons.search),
                                         suffixIcon: searchSubPreguntaController.text.isNotEmpty
@@ -534,174 +606,176 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                                       }
                                     },
                                   )
-                              )
-                            ],
-                          )
-                          : Column(
-                              children: [
-                                FormBuilderDropdown<String>(
-                                  name: 'filtrarSubPregunta',
-                                  menuMaxHeight: 400.0, // Altura máxima del cuadro desplegable
-                                  initialValue: selectedFilterSubPregunta,
-                                  style: isTabletDevice ?  null  : TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 1, 1, 1)),
-                                  decoration: InputDecoration(
-                                    labelText: 'Filtrar por',
-                                    labelStyle: TextStyle(fontSize: isTabletDevice ? null : 15.sp, fontWeight: FontWeight.bold),
-                                    border: const OutlineInputBorder(),
-                                  ),
-                                  items: [
-                                    'Id de Sub pregunta',
-                                    'Sup Pregunta',
-                                  ].map((filter) => DropdownMenuItem(
-                                    value: filter,
-                                    child: Text(filter),
-                                  )).toList(),
-                                  onChanged: (value) => setState(() {
-                                    selectedFilterSubPregunta = value!;
-                                  }),
-                                ),
-                                const SizedBox(height: 16),
-
-                                FormBuilderTextField(
-                                  name: 'searchSubPregunta',
-                                  controller: searchSubPreguntaController,
-                                  style: const TextStyle(fontSize: 20.0),
-                                  decoration: InputDecoration(
-                                      labelText: 'Buscar',
-                                      labelStyle: const TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
-                                      border: const OutlineInputBorder(),
-                                      prefixIcon: const Icon(Icons.search),
-                                      suffixIcon: searchSubPreguntaController.text.isNotEmpty
-                                          ? IconButton(
-                                        icon: const Icon(Icons.clear),
-                                        onPressed: _limpiarBusqueda,
-                                      )
-                                          : null
-                                  ),
-                                  onChanged: (value) {
-                                    if (value!.isNotEmpty) {
-                                      _filtrarSubPreguntas(value);
-                                    } else {
-                                      setState(() {
-                                        _subPreguntaFiltrada = [];
-                                      });
-                                    }
-                                  },
-                                )
-                              ],
-                            ),
-
-                      const SizedBox(height: 20),
-                      const Divider(),
-
-                      FutureBuilder<List<SubPregunta>>(
-                        future: _subPreguntasData,
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState == ConnectionState.waiting) {
-                            return const Center(child: CircularProgressIndicator());
-                          }else if (snapshot.hasError) {
-                            print('Error al cargar la Sub - Preguntas: ${snapshot.error}');
-                            return Center(child: Text('"Lo sentimos, no pudimos cargar la información en este momento. \nPor favo, inténtalo nuevamente presionando el (botón Refrescar)"', style: TextStyle(fontSize: isTabletDevice ? 11.sp : 9.sp, fontWeight: FontWeight.bold)));
-                          } else {
-                            final subPregTabla = _subPreguntaFiltrada.isNotEmpty
-                                  ? _subPreguntaFiltrada
-                                  : snapshot.data ?? [];
-
-                            return Container(
-                              margin: const EdgeInsets.all(2.0),
-                              padding: const EdgeInsets.all(2.0),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                border: Border.all(color: const Color.fromARGB(255, 74, 71, 71)),
-                                borderRadius: BorderRadius.circular(10.0),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: const Color.fromARGB(255, 9, 9, 9).withOpacity(0.5),
-                                    spreadRadius: 2,
-                                    blurRadius: 7,
-                                    offset: const Offset(0, 3),
-                                  )
-                                ]
+                                ],
                               ),
-                              child: Theme(
-                                data: Theme.of(context).copyWith(
-                                  textTheme: Theme.of(context).textTheme.copyWith(
-                                    bodySmall: TextStyle(
-                                      fontSize: isTabletDevice ? 9.sp : 9.sp,  // Ajusta el tamaño del número
-                                      color: Colors.black,    // Cambia el color del texto (ajústalo según tu preferencia)
-                                      fontWeight: FontWeight.bold, // Hace el texto más visible
+            
+                        const SizedBox(height: 20),
+                        const Divider(),
+            
+                        FutureBuilder<List<SubPregunta>>(
+                          future: _subPreguntasData,
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              return const Center(child: CircularProgressIndicator());
+                            }else if (snapshot.hasError) {
+                              print('Error al cargar la Sub - Preguntas: ${snapshot.error}');
+                              return Center(child: Text('"Lo sentimos, no pudimos cargar la información en este momento. \nPor favo, inténtalo nuevamente presionando el (botón Refrescar)"', style: TextStyle(fontSize: isTabletDevice ? 11.sp : 9.sp, fontWeight: FontWeight.bold)));
+                            } else {
+                              final subPregTabla = _subPreguntaFiltrada.isNotEmpty
+                                    ? _subPreguntaFiltrada
+                                    : snapshot.data ?? [];
+            
+                              return Container(
+                                margin: const EdgeInsets.all(2.0),
+                                padding: const EdgeInsets.all(2.0),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  border: Border.all(color: const Color.fromARGB(255, 74, 71, 71)),
+                                  borderRadius: BorderRadius.circular(10.0),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: const Color.fromARGB(255, 9, 9, 9).withOpacity(0.5),
+                                      spreadRadius: 2,
+                                      blurRadius: 7,
+                                      offset: const Offset(0, 3),
+                                    )
+                                  ]
+                                ),
+                                child: Theme(
+                                  data: Theme.of(context).copyWith(
+                                    textTheme: Theme.of(context).textTheme.copyWith(
+                                      bodySmall: TextStyle(
+                                        fontSize: isTabletDevice ? 9.sp : 9.sp,  // Ajusta el tamaño del número
+                                        color: Colors.black,    // Cambia el color del texto (ajústalo según tu preferencia)
+                                        fontWeight: FontWeight.bold, // Hace el texto más visible
+                                      ),
                                     ),
                                   ),
-                                ),
-                                child: PaginatedDataTable(
-                                  columns: [
-                                    DataColumn(label: Text('NO', style: TextStyle(fontSize: isTabletDevice ? 12.sp : 12.sp, color: Colors.white, fontWeight: FontWeight.bold))),
-                                    DataColumn(label: Text('Sub Preguntas', style: TextStyle(fontSize: isTabletDevice ? 12.sp : 12.sp, color: Colors.white, fontWeight: FontWeight.bold))),
-                                    DataColumn(label: Text('Acción', style: TextStyle(fontSize: isTabletDevice ? 12.sp : 12.sp, color: Colors.white, fontWeight: FontWeight.bold)))
-                                  ],
-                                  source: _SubPreguntasDataSource(subPregTabla, _showEditDialogSubPregunta, _showDeleteDialogSubPregunta, isTabletDevice),
-                                  headingRowColor: WidgetStateProperty.all<Color>(const Color.fromARGB(255, 2, 37, 4)), // Fondo de encabezado
-                                  rowsPerPage: 7, //numeros de filas
-                                  columnSpacing: 50, //espacios entre columnas
-                                  horizontalMargin: 30, //para aplicarle un margin horizontal a los campo de la tabla
-                                  showCheckboxColumn: false, //oculta la columna de checkboxes
-                                  dataRowMinHeight: 60.0,  // Altura mínima de fila
-                                  dataRowMaxHeight: 80.0,  // Altura máxima de fila
-                                  showFirstLastButtons: true,
-                                ),
-                              ),
-                            );
-                          }
-                        }
-                      ),
-                      const Divider(),
-
-                      const SizedBox(height: 20),
-                      const Text(
-                        'Tablas administrativa para gestionar las preguntas',
-                        style: TextStyle(fontSize: 23, fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 20),
-
-                      (isTabletDevice)
-                        ? Row(
-                            children: [
-                              Expanded(
-                                child: FormBuilderDropdown<String>(
-                                  name: 'filtrarSesion',
-                                  menuMaxHeight: 400.0, // Altura máxima del cuadro desplegable
-                                  initialValue: selectedFilterSesion,
-                                  style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 1, 1, 1)),
-                                  decoration: const InputDecoration(
-                                    labelText: 'Filtrar por',
-                                    labelStyle: TextStyle(fontSize: 25.0, fontWeight: FontWeight.bold),
-                                    border: OutlineInputBorder(),
+                                  child: PaginatedDataTable(
+                                    columns: [
+                                      DataColumn(label: Text('NO', style: TextStyle(fontSize: isTabletDevice ? 12.sp : 12.sp, color: Colors.white, fontWeight: FontWeight.bold))),
+                                      DataColumn(label: Text('Sub Preguntas', style: TextStyle(fontSize: isTabletDevice ? 12.sp : 12.sp, color: Colors.white, fontWeight: FontWeight.bold))),
+                                      DataColumn(label: Text('Acción', style: TextStyle(fontSize: isTabletDevice ? 12.sp : 12.sp, color: Colors.white, fontWeight: FontWeight.bold)))
+                                    ],
+                                    source: _SubPreguntasDataSource(subPregTabla, _showEditDialogSubPregunta, _showDeleteDialogSubPregunta, isTabletDevice),
+                                    headingRowColor: WidgetStateProperty.all<Color>(const Color.fromARGB(255, 2, 37, 4)), // Fondo de encabezado
+                                    rowsPerPage: 7, //numeros de filas
+                                    columnSpacing: 50, //espacios entre columnas
+                                    horizontalMargin: 30, //para aplicarle un margin horizontal a los campo de la tabla
+                                    showCheckboxColumn: false, //oculta la columna de checkboxes
+                                    dataRowMinHeight: 60.0,  // Altura mínima de fila
+                                    dataRowMaxHeight: 80.0,  // Altura máxima de fila
+                                    showFirstLastButtons: true,
                                   ),
-                                  items: [
-                                    'Numero de Seccion',
-                                    'Tipo de Respuesta',
-                                    'Numero de Pregunta',
-                                    'No. de Sup Pregunta'
-                                  ].map((filter) => DropdownMenuItem(
-                                    value: filter,
-                                    child: Text(filter),
-                                  )).toList(),
-                                  onChanged: (value) => setState(() {
-                                    selectedFilterSesion = value!;
-                                  }),
                                 ),
-                              ),
-                              const SizedBox(width: 16),
-
-                              Expanded(
-                                  flex: 2,
-                                  child: FormBuilderTextField(
+                              );
+                            }
+                          }
+                        ),
+                        const Divider(),
+            
+                        const SizedBox(height: 20),
+                        const Text(
+                          'Tablas administrativa para gestionar las preguntas',
+                          style: TextStyle(fontSize: 23, fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 20),
+            
+                        (isTabletDevice)
+                          ? Row(
+                              children: [
+                                Expanded(
+                                  child: FormBuilderDropdown<String>(
+                                    name: 'filtrarSesion',
+                                    menuMaxHeight: 400.0, // Altura máxima del cuadro desplegable
+                                    initialValue: selectedFilterSesion,
+                                    style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 1, 1, 1)),
+                                    decoration: const InputDecoration(
+                                      labelText: 'Filtrar por',
+                                      labelStyle: TextStyle(fontSize: 25.0, fontWeight: FontWeight.bold),
+                                      border: OutlineInputBorder(),
+                                    ),
+                                    items: [
+                                      'Numero de Seccion',
+                                      'Tipo de Respuesta',
+                                      'Numero de Pregunta',
+                                      'No. de Sup Pregunta'
+                                    ].map((filter) => DropdownMenuItem(
+                                      value: filter,
+                                      child: Text(filter),
+                                    )).toList(),
+                                    onChanged: (value) => setState(() {
+                                      selectedFilterSesion = value!;
+                                    }),
+                                  ),
+                                ),
+                                const SizedBox(width: 16),
+            
+                                Expanded(
+                                    flex: 2,
+                                    child: FormBuilderTextField(
+                                      name: 'searchSesion',
+                                      controller: searchSesionController,
+                                      style: const TextStyle(fontSize: 15),
+                                      decoration: InputDecoration(
+                                          labelText: 'Buscar',
+                                          labelStyle: const TextStyle(fontSize: 25.0, fontWeight: FontWeight.bold),
+                                          border: const OutlineInputBorder(),
+                                          prefixIcon: const Icon(Icons.search),
+                                          suffixIcon: searchSesionController.text.isNotEmpty
+                                              ? IconButton(
+                                            icon: const Icon(Icons.clear),
+                                            onPressed: _limpiarBusqueda,
+                                          )
+                                              : null
+                                      ),
+                                      onChanged: (value) {
+                                        if (value!.isNotEmpty) {
+                                          _filtrarSesion(value);
+                                        } else {
+                                          setState(() {
+                                            _sesionFiltrada = [];
+                                          });
+                                        }
+                                      },
+                                    )
+                                )
+                              ],
+                            )
+                            : Column(
+                                children: [
+                                  FormBuilderDropdown<String>(
+                                    name: 'filtrarSesion',
+                                    menuMaxHeight: 400.0, // Altura máxima del cuadro desplegable
+                                    initialValue: selectedFilterSesion,
+                                    style: isTabletDevice ?  null  : TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 1, 1, 1)),
+                                    decoration: InputDecoration(
+                                      labelText: 'Filtrar por',
+                                      labelStyle: TextStyle(fontSize: isTabletDevice ? null : 15.sp, fontWeight: FontWeight.bold),
+                                      border: const OutlineInputBorder(),
+                                    ),
+                                    items: [
+                                      'Numero de Seccion',
+                                      'Tipo de Respuesta',
+                                      'Numero de Pregunta',
+                                      'No. de Sup Pregunta'
+                                    ].map((filter) => DropdownMenuItem(
+                                      value: filter,
+                                      child: Text(filter),
+                                    )).toList(),
+                                    onChanged: (value) => setState(() {
+                                      selectedFilterSesion = value!;
+                                    }),
+                                  ),
+                                  const SizedBox(height: 16),
+            
+                                  FormBuilderTextField(
                                     name: 'searchSesion',
                                     controller: searchSesionController,
-                                    style: const TextStyle(fontSize: 15),
+                                    style: const TextStyle(fontSize: 20.0),
                                     decoration: InputDecoration(
                                         labelText: 'Buscar',
-                                        labelStyle: const TextStyle(fontSize: 25.0, fontWeight: FontWeight.bold),
+                                        labelStyle: TextStyle(fontSize: isTabletDevice ? null : 15.sp, fontWeight: FontWeight.bold),
                                         border: const OutlineInputBorder(),
                                         prefixIcon: const Icon(Icons.search),
                                         suffixIcon: searchSesionController.text.isNotEmpty
@@ -721,164 +795,109 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                                       }
                                     },
                                   )
-                              )
-                            ],
-                          )
-                          : Column(
-                              children: [
-                                FormBuilderDropdown<String>(
-                                  name: 'filtrarSesion',
-                                  menuMaxHeight: 400.0, // Altura máxima del cuadro desplegable
-                                  initialValue: selectedFilterSesion,
-                                  style: isTabletDevice ?  null  : TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 1, 1, 1)),
-                                  decoration: InputDecoration(
-                                    labelText: 'Filtrar por',
-                                    labelStyle: TextStyle(fontSize: isTabletDevice ? null : 15.sp, fontWeight: FontWeight.bold),
-                                    border: const OutlineInputBorder(),
-                                  ),
-                                  items: [
-                                    'Numero de Seccion',
-                                    'Tipo de Respuesta',
-                                    'Numero de Pregunta',
-                                    'No. de Sup Pregunta'
-                                  ].map((filter) => DropdownMenuItem(
-                                    value: filter,
-                                    child: Text(filter),
-                                  )).toList(),
-                                  onChanged: (value) => setState(() {
-                                    selectedFilterSesion = value!;
-                                  }),
-                                ),
-                                const SizedBox(height: 16),
-
-                                FormBuilderTextField(
-                                  name: 'searchSesion',
-                                  controller: searchSesionController,
-                                  style: const TextStyle(fontSize: 20.0),
-                                  decoration: InputDecoration(
-                                      labelText: 'Buscar',
-                                      labelStyle: TextStyle(fontSize: isTabletDevice ? null : 15.sp, fontWeight: FontWeight.bold),
-                                      border: const OutlineInputBorder(),
-                                      prefixIcon: const Icon(Icons.search),
-                                      suffixIcon: searchSesionController.text.isNotEmpty
-                                          ? IconButton(
-                                        icon: const Icon(Icons.clear),
-                                        onPressed: _limpiarBusqueda,
-                                      )
-                                          : null
-                                  ),
-                                  onChanged: (value) {
-                                    if (value!.isNotEmpty) {
-                                      _filtrarSesion(value);
-                                    } else {
-                                      setState(() {
-                                        _sesionFiltrada = [];
-                                      });
-                                    }
-                                  },
-                                )
-                              ],
-                            ),
-
-                      const SizedBox(height: 20),
-                      const Divider(),
-
-                      FutureBuilder<List<DtoShowQuestions>>(
-                        future: _dtoShowQuestionsData,
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState == ConnectionState.waiting) {
-                            return const Center(child: CircularProgressIndicator());
-                          }else if (snapshot.hasError) {
-                            print('snapshot.hasError: ${snapshot.hasError}');
-                            return Center(child: Text('"Lo sentimos, no pudimos cargar la información en este momento. \nPor favo, inténtalo nuevamente presionando el (botón Refrescar)"', style: TextStyle(fontSize: isTabletDevice ? 11.sp : 9.sp, fontWeight: FontWeight.bold)));
-                          } else if (snapshot.hasData) {
-                            final sesionTable = _sesionFiltrada.isNotEmpty
-                                  ? _sesionFiltrada
-                                  : snapshot.data ?? [];
-
-                            _sortSectionByState(sesionTable);
-
-                            bool estadoActivo = sesionTable.every((sesion) => sesion.estadoDto);
-
-                            return Container(
-                              margin: const EdgeInsets.all(2.0),
-                              padding: const EdgeInsets.all(2.0),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                border: Border.all(color: const Color.fromARGB(255, 74, 71, 71)),
-                                borderRadius: BorderRadius.circular(10.0),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: const Color.fromARGB(255, 9, 9, 9).withOpacity(0.5),
-                                    spreadRadius: 2,
-                                    blurRadius: 7,
-                                    offset: const Offset(0, 3),
-                                  )
-                                ]
+                                ],
                               ),
-                              child: Theme(
-                                data: Theme.of(context).copyWith(
-                                  textTheme: Theme.of(context).textTheme.copyWith(
-                                    bodySmall: TextStyle(
-                                      fontSize: isTabletDevice ? 9.sp : 9.sp,           // Ajusta el tamaño del número
-                                      color: Colors.black,    // Cambia el color del texto (ajústalo según tu preferencia)
-                                      fontWeight: FontWeight.bold, // Hace el texto más visible
+            
+                        const SizedBox(height: 20),
+                        const Divider(),
+            
+                        FutureBuilder<List<DtoShowQuestions>>(
+                          future: _dtoShowQuestionsData,
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              return const Center(child: CircularProgressIndicator());
+                            }else if (snapshot.hasError) {
+                              print('snapshot.hasError: ${snapshot.hasError}');
+                              return Center(child: Text('"Lo sentimos, no pudimos cargar la información en este momento. \nPor favo, inténtalo nuevamente presionando el (botón Refrescar)"', style: TextStyle(fontSize: isTabletDevice ? 11.sp : 9.sp, fontWeight: FontWeight.bold)));
+                            } else if (snapshot.hasData) {
+                              final sesionTable = _sesionFiltrada.isNotEmpty
+                                    ? _sesionFiltrada
+                                    : snapshot.data ?? [];
+            
+                              _sortSectionByState(sesionTable);
+            
+                              bool estadoActivo = sesionTable.every((sesion) => sesion.estadoDto);
+            
+                              return Container(
+                                margin: const EdgeInsets.all(2.0),
+                                padding: const EdgeInsets.all(2.0),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  border: Border.all(color: const Color.fromARGB(255, 74, 71, 71)),
+                                  borderRadius: BorderRadius.circular(10.0),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: const Color.fromARGB(255, 9, 9, 9).withOpacity(0.5),
+                                      spreadRadius: 2,
+                                      blurRadius: 7,
+                                      offset: const Offset(0, 3),
+                                    )
+                                  ]
+                                ),
+                                child: Theme(
+                                  data: Theme.of(context).copyWith(
+                                    textTheme: Theme.of(context).textTheme.copyWith(
+                                      bodySmall: TextStyle(
+                                        fontSize: isTabletDevice ? 9.sp : 9.sp,           // Ajusta el tamaño del número
+                                        color: Colors.black,    // Cambia el color del texto (ajústalo según tu preferencia)
+                                        fontWeight: FontWeight.bold, // Hace el texto más visible
+                                      ),
                                     ),
                                   ),
-                                ),
-                                child: PaginatedDataTable(
-                                  header: Text('Tabla de Recopilación para Encuesta', style: TextStyle(fontSize: isTabletDevice ? 9.sp : 9.sp, fontWeight: FontWeight.bold)),
-                                  columns: [
-                                    DataColumn(label: Text('No. de Sección', style: TextStyle(fontSize: isTabletDevice ? 9.sp : 9.sp, color: Colors.white, fontWeight: FontWeight.bold))),
-                                    DataColumn(label: Text('Tipo de Respuesta.', style: TextStyle(fontSize: isTabletDevice ? 9.sp : 9.sp, color: Colors.white, fontWeight: FontWeight.bold))),
-                                    DataColumn(label: Text('Número de \nPregunta en la \nEncuesta.', style: TextStyle(fontSize: isTabletDevice ? 9.sp : 9.sp, color: Colors.white, fontWeight: FontWeight.bold))),
-                                    DataColumn(label: Text('No. Pregunta.', style: TextStyle(fontSize: isTabletDevice ? 9.sp : 9.sp, color: Colors.white, fontWeight: FontWeight.bold))),
-                                    DataColumn(label: Text('Pregunta.', style: TextStyle(fontSize: isTabletDevice ? 9.sp : 9.sp, color: Colors.white, fontWeight: FontWeight.bold))),
-                                    DataColumn(label: Text('No. Sub Pregunta.', style: TextStyle(fontSize: isTabletDevice ? 9.sp : 9.sp, color: Colors.white, fontWeight: FontWeight.bold))),
-                                    DataColumn(label: Text('Sub Pregunta.', style: TextStyle(fontSize: isTabletDevice ? 9.sp : 9.sp, color: Colors.white, fontWeight: FontWeight.bold))),
-                                    DataColumn(label: Text('Requerimiento (Opcional).', style: TextStyle(fontSize: isTabletDevice ? 9.sp : 9.sp, color: Colors.white, fontWeight: FontWeight.bold))),
-                                    DataColumn(label: Text('Enviar esta \npregunta a la \nencuesta.', style: TextStyle(fontSize: isTabletDevice ? 9.sp : 9.sp, color: Colors.white, fontWeight: FontWeight.bold))),
-                                    DataColumn(label: Text('Acción', style: TextStyle(fontSize: isTabletDevice ? 9.sp : 9.sp, color: Colors.white, fontWeight: FontWeight.bold)))
-                                  ],
-                                  source: _DtoShowQuestionsDataSource(sesionTable, onEditFromDto, onDeleteFromDto, onEstadoFromDto, isTabletDevice),
-                                  headingRowColor: WidgetStateProperty.all<Color>(const Color.fromARGB(255, 2, 37, 4)), // Fondo de encabezado
-                                  rowsPerPage: 5, //numeros de filas
-                                  columnSpacing: 50, //espacios entre columnas
-                                  horizontalMargin: 40, //para aplicarle un margin horizontal a los campo de la tabla
-                                  showCheckboxColumn: false, //oculta la columna de checkboxes
-                                  dataRowMinHeight: 60.0,  // Altura mínima de fila
-                                  dataRowMaxHeight: 80.0,  // Altura máxima de fila
-                                  showFirstLastButtons: true,
-                                  headingRowHeight: 135.0, // Altura del encabezado
-                                  actions: [
-                                    ElevatedButton(
-                                      onPressed: () {
-                                        _actualizarEstadoTodasSesiones(sesionTable, !estadoActivo);
-                                        setState(() {
-                                          for (var sesion in sesionTable) {
-                                            sesion.estadoDto = !estadoActivo;
-                                          }
-                                        });
-                                      },
-                                      child: Text(
-                                        estadoActivo ? 'Deshabilitar Encuestas' : 'Habilitar Encuestas',
-                                        style: TextStyle(fontSize: isTabletDevice ? 10.sp : 10.sp, color: const Color.fromARGB(255, 1, 133, 14), fontWeight: FontWeight.bold),
+                                  child: PaginatedDataTable(
+                                    header: Text('Tabla de Recopilación para Encuesta', style: TextStyle(fontSize: isTabletDevice ? 9.sp : 9.sp, fontWeight: FontWeight.bold)),
+                                    columns: [
+                                      DataColumn(label: Text('No. de Sección', style: TextStyle(fontSize: isTabletDevice ? 9.sp : 9.sp, color: Colors.white, fontWeight: FontWeight.bold))),
+                                      DataColumn(label: Text('Tipo de Respuesta.', style: TextStyle(fontSize: isTabletDevice ? 9.sp : 9.sp, color: Colors.white, fontWeight: FontWeight.bold))),
+                                      DataColumn(label: Text('Número de \nPregunta en la \nEncuesta.', style: TextStyle(fontSize: isTabletDevice ? 9.sp : 9.sp, color: Colors.white, fontWeight: FontWeight.bold))),
+                                      DataColumn(label: Text('No. Pregunta.', style: TextStyle(fontSize: isTabletDevice ? 9.sp : 9.sp, color: Colors.white, fontWeight: FontWeight.bold))),
+                                      DataColumn(label: Text('Pregunta.', style: TextStyle(fontSize: isTabletDevice ? 9.sp : 9.sp, color: Colors.white, fontWeight: FontWeight.bold))),
+                                      DataColumn(label: Text('No. Sub Pregunta.', style: TextStyle(fontSize: isTabletDevice ? 9.sp : 9.sp, color: Colors.white, fontWeight: FontWeight.bold))),
+                                      DataColumn(label: Text('Sub Pregunta.', style: TextStyle(fontSize: isTabletDevice ? 9.sp : 9.sp, color: Colors.white, fontWeight: FontWeight.bold))),
+                                      DataColumn(label: Text('Requerimiento (Opcional).', style: TextStyle(fontSize: isTabletDevice ? 9.sp : 9.sp, color: Colors.white, fontWeight: FontWeight.bold))),
+                                      DataColumn(label: Text('Enviar esta \npregunta a la \nencuesta.', style: TextStyle(fontSize: isTabletDevice ? 9.sp : 9.sp, color: Colors.white, fontWeight: FontWeight.bold))),
+                                      DataColumn(label: Text('Acción', style: TextStyle(fontSize: isTabletDevice ? 9.sp : 9.sp, color: Colors.white, fontWeight: FontWeight.bold)))
+                                    ],
+                                    source: _DtoShowQuestionsDataSource(sesionTable, onEditFromDto, onDeleteFromDto, onEstadoFromDto, isTabletDevice),
+                                    headingRowColor: WidgetStateProperty.all<Color>(const Color.fromARGB(255, 2, 37, 4)), // Fondo de encabezado
+                                    rowsPerPage: 5, //numeros de filas
+                                    columnSpacing: 50, //espacios entre columnas
+                                    horizontalMargin: 40, //para aplicarle un margin horizontal a los campo de la tabla
+                                    showCheckboxColumn: false, //oculta la columna de checkboxes
+                                    dataRowMinHeight: 60.0,  // Altura mínima de fila
+                                    dataRowMaxHeight: 80.0,  // Altura máxima de fila
+                                    showFirstLastButtons: true,
+                                    headingRowHeight: 135.0, // Altura del encabezado
+                                    actions: [
+                                      ElevatedButton(
+                                        onPressed: () {
+                                          _actualizarEstadoTodasSesiones(sesionTable, !estadoActivo);
+                                          setState(() {
+                                            for (var sesion in sesionTable) {
+                                              sesion.estadoDto = !estadoActivo;
+                                            }
+                                          });
+                                        },
+                                        child: Text(
+                                          estadoActivo ? 'Deshabilitar Encuestas' : 'Habilitar Encuestas',
+                                          style: TextStyle(fontSize: isTabletDevice ? 10.sp : 10.sp, color: const Color.fromARGB(255, 1, 133, 14), fontWeight: FontWeight.bold),
+                                        )
                                       )
-                                    )
-                                  ],
+                                    ],
+                                  ),
                                 ),
-                              ),
-                            );
-                          } else {
-                            return const Center(child: Text('No hay datos disponibles.'));
-                          }
-                        },
-                      )
-                    ],
+                              );
+                            } else {
+                              return const Center(child: Text('No hay datos disponibles.'));
+                            }
+                          },
+                        )
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
           floatingActionButton: Stack(
             children: [
@@ -2170,6 +2189,8 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
   }
 
   Future<void> _actualizarEstadoTodasSesiones(List<DtoShowQuestions> listaQuestions, bool nuevoEstado) async {
+    _showWaitDialog(context, 'Por favor espere... \nTodas las secciones estan siendo actualizadas.');
+
     try {
       for (var dto in listaQuestions) {
         final sesion = mapDtoToSesion(dto);
@@ -2204,8 +2225,9 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
           }
         }
       }
-      _showSuccessDialog(context, 'Todas las secciones han sido ${nuevoEstado ? 'enviadas a la Encuesta' : 'deshabilitadas de la Encuesta'}');
       _refreshSesion();
+      Navigator.of(context).pop();
+      _showSuccessDialog(context, 'Todas las secciones han sido ${nuevoEstado ? 'enviadas a la Encuesta' : 'deshabilitadas de la Encuesta'}');
     } catch (e) {
       print('Error al actualizar todas las sesiones: $e');
       _showErrorDialog(context, 'Error al actualizar todas las sesiones');
@@ -2317,6 +2339,69 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                 ElevatedButton(
                   onPressed: () => Navigator.of(context).pop(), 
                   child: const Text('OK', style: TextStyle(fontSize: 18.0)),
+                )
+              ]
+            )
+          )
+        );
+      }
+    );
+  }
+
+  void _showWaitDialog (BuildContext context, String message) {
+    final isTabletDevice = isTablet(context);
+    showDialog(
+      context: context,
+      builder: (context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20)
+          ),
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 25, horizontal: 40),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(15),
+              boxShadow: [
+                BoxShadow(
+                    color: Colors.grey.withOpacity(0.5),
+                    spreadRadius: 5,
+                    blurRadius: 7,
+                    offset: const Offset(0, 3)
+                )
+              ]
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.access_time_filled_sharp, color: Color.fromARGB(255, 181, 3, 83), size: 80.0),
+                const SizedBox(height: 20),
+                const Text(
+                  'One Moment!!!',
+                  style: TextStyle(fontSize: 30.0, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 8.0),
+                Text(
+                  message,
+                  style: TextStyle(fontSize: isTabletDevice ? 13.sp : 13.sp),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 24.0),
+                Flex(
+                  direction: isTabletDevice ? Axis.horizontal : Axis.vertical,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {Navigator.of(context).pop();},
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(horizontal: 45, vertical: 15),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(50),
+                        ),
+                      ),
+                      child: Text('Ok', style: TextStyle(fontSize: isTabletDevice ? 10.sp : 10.sp, color: const Color.fromARGB(255, 243, 33, 33))),
+                    )
+                  ],
                 )
               ]
             )

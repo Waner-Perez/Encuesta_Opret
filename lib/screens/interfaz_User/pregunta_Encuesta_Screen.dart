@@ -119,84 +119,86 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                 )
               ],
             ),
-            body: Column(
-              children: [
-                Expanded(
-                  child: FutureBuilder<List<SpPreguntascompleta>>(
-                      future: _preguntasFuture,
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return Center(
-                              child: Dialog(
-                            backgroundColor: Colors.transparent,
-                            child: Container(
-                              width: 200,
-                              height: 220,
-                              decoration: BoxDecoration(
-                                color: Colors.black.withOpacity(0.7),
-                                borderRadius: BorderRadius.circular(100),
+            body: SafeArea(
+              child: Column(
+                children: [
+                  Expanded(
+                    child: FutureBuilder<List<SpPreguntascompleta>>(
+                        future: _preguntasFuture,
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return Center(
+                                child: Dialog(
+                              backgroundColor: Colors.transparent,
+                              child: Container(
+                                width: 200,
+                                height: 220,
+                                decoration: BoxDecoration(
+                                  color: Colors.black.withOpacity(0.7),
+                                  borderRadius: BorderRadius.circular(100),
+                                ),
+                                child: const Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    CircularProgressIndicator(
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                          Colors.green),
+                                    ),
+                                    SizedBox(height: 20),
+                                    Text(
+                                      'Cargando...',
+                                      style: TextStyle(
+                                          color: Colors.white, fontSize: 20),
+                                    ),
+                                  ],
+                                ),
                               ),
-                              child: const Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  CircularProgressIndicator(
-                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                        Colors.green),
-                                  ),
-                                  SizedBox(height: 20),
-                                  Text(
-                                    'Cargando...',
-                                    style: TextStyle(
-                                        color: Colors.white, fontSize: 20),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ));
-                        } else if (snapshot.hasError) {
-                          print('Error al cargar los datos: ${snapshot.error}');
-                          return const Center(
-                              child: Text("Error al cargar las preguntas",
-                                  style: TextStyle(fontSize: 20.0)));
-                        } else if (!snapshot.hasData || (snapshot.data as List).isEmpty) {
-                          return const Center(
-                            child: Text(
-                              'No hay preguntas disponibles \n\nRecuerde refrescar la pantalla cada vez que \nentres y también cuando finalices las \nrespuestas mientras tengas \nconexión a "internet"',
-                              style: TextStyle(fontSize: 20.0),
-                              textAlign: TextAlign.center
-                            )
-                          );
-                        } else {
-                          return _buildPreguntaList();
-                        }
-                      }),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(28.0),
-                  child: SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                        onPressed: () {
-                          _showWarning(context,
-                              'Ten en cuenta que deberás llenar el formulario nuevamente para acceder a esta pantalla.');
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color.fromRGBO(1, 135, 76, 1),
-                          foregroundColor:
-                              const Color.fromARGB(255, 255, 255, 255),
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 40, vertical: 15),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(50),
-                          ),
-                        ),
-                        child: Text('Regresar al formulario.',
-                            style: TextStyle(
-                                fontSize: isTabletDevice ? 13.sp : 18.sp))),
+                            ));
+                          } else if (snapshot.hasError) {
+                            print('Error al cargar los datos: ${snapshot.error}');
+                            return const Center(
+                                child: Text("Error al cargar las preguntas",
+                                    style: TextStyle(fontSize: 20.0)));
+                          } else if (!snapshot.hasData || (snapshot.data as List).isEmpty) {
+                            return const Center(
+                              child: Text(
+                                'No hay preguntas disponibles \n\nRecuerde refrescar la pantalla cada vez que \nentres y también cuando finalices las \nrespuestas mientras tengas \nconexión a "internet"',
+                                style: TextStyle(fontSize: 20.0),
+                                textAlign: TextAlign.center
+                              )
+                            );
+                          } else {
+                            return _buildPreguntaList();
+                          }
+                        }),
                   ),
-                )
-              ],
+                  Padding(
+                    padding: const EdgeInsets.all(28.0),
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                          onPressed: () {
+                            _showWarning(context,
+                                'Ten en cuenta que deberás llenar el formulario nuevamente para acceder a esta pantalla.');
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color.fromRGBO(1, 135, 76, 1),
+                            foregroundColor:
+                                const Color.fromARGB(255, 255, 255, 255),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 40, vertical: 15),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(50),
+                            ),
+                          ),
+                          child: Text('Regresar al formulario.',
+                              style: TextStyle(
+                                  fontSize: isTabletDevice ? 13.sp : 18.sp))),
+                    ),
+                  )
+                ],
+              ),
             )),
       ),
     );
