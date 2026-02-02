@@ -25,7 +25,7 @@ class ResertpasswordScreen extends StatefulWidget {
 
 class _ResertpasswordScreenState extends State<ResertpasswordScreen> {
   final _formkey = GlobalKey<FormBuilderState>();
-  final ApiResertPasswordServices _resert = ApiResertPasswordServices('https://10.0.2.2:7190');
+  final ApiResertPasswordServices _resert = ApiResertPasswordServices('https://api.encuesta.opret.gob.do');
   bool _obscureText = true;
   bool _obscureTextConfirm = true;
 

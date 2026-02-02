@@ -6,8 +6,8 @@ import 'package:formulario_opret/services/sesion_services.dart';
 
 class SectionController {
   final SectionCrud _sectionCrud = SectionCrud();
-  final ApiServiceSesion2 _apiServiceSesion2 = ApiServiceSesion2('https://10.0.2.2:7190');
-  final StreamServices _streamServices = StreamServices('https://10.0.2.2:7190');
+  final ApiServiceSesion2 _apiServiceSesion2 = ApiServiceSesion2('https://api.encuesta.opret.gob.do');
+  final StreamServices _streamServices = StreamServices('https://api.encuesta.opret.gob.do');
 
   SectionController() {
     _streamServices.backendAvailabilityStream.listen((isAvailable) {

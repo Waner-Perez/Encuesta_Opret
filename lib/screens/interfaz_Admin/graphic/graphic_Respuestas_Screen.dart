@@ -27,76 +27,78 @@ class _GraphicRespScreenState extends State<GraphicRespScreen> {
       appBar: AppBar( 
         title: const Text('Gráfica de Respuestas'),
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            //gráfica: Pie chart
-            Container(
-              margin: const EdgeInsets.symmetric(horizontal: 10.0),
-              height: 1000, // Ajustar altura según sea necesario
-              child: SfCircularChart(
-                //texto del título
-                title: const ChartTitle(
-                  text: 'Preguntas y Respuestas',
-                  textStyle: TextStyle(
-                    fontSize: 25,
-                    fontWeight: FontWeight.bold
-                  )
-                ),
-                //texto de la leyenda
-                legend: Legend(
-                  isVisible: true,
-                  toggleSeriesVisibility: true, // Habilita o deshabilita el ocultamiento
-                  overflowMode: LegendItemOverflowMode.scroll, // Ajusta el orden de los item de la leyendas
-                  textStyle: const TextStyle(fontSize: 18), // Tamaño del texto de la leyenda
-                  position: LegendPosition.bottom, // posiciona la Leyendas en cualquier parte de la gráfico
-                  orientation: LegendItemOrientation.vertical, // para organizar las leyendas en horizontal
-                  isResponsive: true,
-                  iconHeight: 20.0,
-                  iconWidth: 20.0,
-                  // Aquí utilizamos el legendItemBuilder para personalizar la leyenda
-                  legendItemBuilder: (String name, dynamic series, dynamic point, int index) {
-                    return Row(
-                      children: [
-                        Checkbox(
-                          value: point.isVisible,
-                          onChanged: (bool? value) {
-                            setState(() {
-                              (series.dataSource as List<ChartData>)[index].isVisible = value!;
-                            });
-                          },
-                        ),
-                        Text(name, style: const TextStyle(fontSize: 18)),
-                      ],
-                    );
-                  },
-                ),
-                tooltipBehavior: TooltipBehavior(
-                  enable: true,
-                  textStyle: const TextStyle(
-                    fontSize: 18, // Aumentar el tamaño del texto del tooltip
-                    fontWeight: FontWeight.bold,
-                  )
-                ),
-                series: <CircularSeries>[
-                  PieSeries<ChartData, String>(
-                    dataSource: chartData,
-                    xValueMapper: (ChartData data, _) => data.respuesta,
-                    yValueMapper: (ChartData data, _) => data.frecuencia,
-                    //texto de las etiquetas
-                    dataLabelSettings: const DataLabelSettings(
-                      isVisible: true,
-                      textStyle: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-                    ),
-                    explode: true, // Resalta las secciones
-                    explodeIndex: 0, // Primera sección explotada por defecto
-                    enableTooltip: true,
-                    animationDuration: 1000,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              //gráfica: Pie chart
+              Container(
+                margin: const EdgeInsets.symmetric(horizontal: 10.0),
+                height: 1000, // Ajustar altura según sea necesario
+                child: SfCircularChart(
+                  //texto del título
+                  title: const ChartTitle(
+                    text: 'Preguntas y Respuestas',
+                    textStyle: TextStyle(
+                      fontSize: 25,
+                      fontWeight: FontWeight.bold
+                    )
                   ),
-                ],
-              ),
-            )
-          ],
+                  //texto de la leyenda
+                  legend: Legend(
+                    isVisible: true,
+                    toggleSeriesVisibility: true, // Habilita o deshabilita el ocultamiento
+                    overflowMode: LegendItemOverflowMode.scroll, // Ajusta el orden de los item de la leyendas
+                    textStyle: const TextStyle(fontSize: 18), // Tamaño del texto de la leyenda
+                    position: LegendPosition.bottom, // posiciona la Leyendas en cualquier parte de la gráfico
+                    orientation: LegendItemOrientation.vertical, // para organizar las leyendas en horizontal
+                    isResponsive: true,
+                    iconHeight: 20.0,
+                    iconWidth: 20.0,
+                    // Aquí utilizamos el legendItemBuilder para personalizar la leyenda
+                    legendItemBuilder: (String name, dynamic series, dynamic point, int index) {
+                      return Row(
+                        children: [
+                          Checkbox(
+                            value: point.isVisible,
+                            onChanged: (bool? value) {
+                              setState(() {
+                                (series.dataSource as List<ChartData>)[index].isVisible = value!;
+                              });
+                            },
+                          ),
+                          Text(name, style: const TextStyle(fontSize: 18)),
+                        ],
+                      );
+                    },
+                  ),
+                  tooltipBehavior: TooltipBehavior(
+                    enable: true,
+                    textStyle: const TextStyle(
+                      fontSize: 18, // Aumentar el tamaño del texto del tooltip
+                      fontWeight: FontWeight.bold,
+                    )
+                  ),
+                  series: <CircularSeries>[
+                    PieSeries<ChartData, String>(
+                      dataSource: chartData,
+                      xValueMapper: (ChartData data, _) => data.respuesta,
+                      yValueMapper: (ChartData data, _) => data.frecuencia,
+                      //texto de las etiquetas
+                      dataLabelSettings: const DataLabelSettings(
+                        isVisible: true,
+                        textStyle: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                      ),
+                      explode: true, // Resalta las secciones
+                      explodeIndex: 0, // Primera sección explotada por defecto
+                      enableTooltip: true,
+                      animationDuration: 1000,
+                    ),
+                  ],
+                ),
+              )
+            ],
+          ),
         ),
       )
     );

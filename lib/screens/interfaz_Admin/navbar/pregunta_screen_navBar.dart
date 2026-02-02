@@ -31,13 +31,13 @@ class PreguntaScreenNavbar extends StatefulWidget {
 
 class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
   final _formKey = GlobalKey<FormBuilderState>();
-  final ApiServicePreguntas _apiServicePreguntas = ApiServicePreguntas('https://10.0.2.2:7190');
+  final ApiServicePreguntas _apiServicePreguntas = ApiServicePreguntas('https://api.encuesta.opret.gob.do');
   late Future<List<Preguntas>> _preguntasData;
-  final ApiServiceSubPreguntas  _apiServiceSubPreguntas = ApiServiceSubPreguntas('https://10.0.2.2:7190');
+  final ApiServiceSubPreguntas  _apiServiceSubPreguntas = ApiServiceSubPreguntas('https://api.encuesta.opret.gob.do');
   late Future<List<SubPregunta>> _subPreguntasData;
-  // final ApiServiceSesion _apiServiceSesion = ApiServiceSesion('https://10.0.2.2:7190');
+  // final ApiServiceSesion _apiServiceSesion = ApiServiceSesion('https://api.encuesta.opret.gob.do');
   // late Future<List<Sesion>> _sesionData;
-  final ApiServiceSesion2 _apiServiceSesion2 = ApiServiceSesion2('https://10.0.2.2:7190');
+  final ApiServiceSesion2 _apiServiceSesion2 = ApiServiceSesion2('https://api.encuesta.opret.gob.do');
   late Future<List<DtoShowQuestions>> _dtoShowQuestionsData;
   String selectedTipRespuestas = 'Respuesta Abierta';
   final tipoRespuestaController = TextEditingController();
@@ -1050,7 +1050,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                   final dataPreg = _formKey.currentState!.value;
                   final newQuestion = int.parse(dataPreg['noPregunta']);
 
-                  Preguntas? existingQuestion = await ApiServicePreguntas('https://10.0.2.2:7190').getOnePregunta(newQuestion);
+                  Preguntas? existingQuestion = await ApiServicePreguntas('https://api.encuesta.opret.gob.do').getOnePregunta(newQuestion);
 
                   if (existingQuestion != null) {
                     showDialog(
@@ -1083,7 +1083,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                   ); // Para verificar el valor antes de la asignación
 
                   try{
-                    final response = await ApiServicePreguntas('https://10.0.2.2:7190').postPreguntas(nuevaPregunta);
+                    final response = await ApiServicePreguntas('https://api.encuesta.opret.gob.do').postPreguntas(nuevaPregunta);
 
                     if(response.statusCode == 201) {
                       print('La pregunta fue creado con éxito');
@@ -1164,7 +1164,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                   );
 
                   try{
-                    final response = await ApiServicePreguntas('https://10.0.2.2:7190')
+                    final response = await ApiServicePreguntas('https://api.encuesta.opret.gob.do')
                       .putPreguntas(questionUpLoad.codPregunta, askUpLoad);
 
                     if(response.statusCode == 204) {
@@ -1221,7 +1221,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
               onPressed: () async {
                 // Llamar al servicio de eliminación
                 try {
-                  final response = await ApiServicePreguntas('https://10.0.2.2:7190')
+                  final response = await ApiServicePreguntas('https://api.encuesta.opret.gob.do')
                       .deletePreguntas(questionDelete.codPregunta);
                   if (response.statusCode == 204) {
                     print('Pregunta eliminado con éxito');
@@ -1306,7 +1306,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                   final dataSebPreg = _formKey.currentState!.value;
                   final newSubPregunta = dataSebPreg['codigo'];
 
-                  SubPregunta? existingSubPregunta = await ApiServiceSubPreguntas('https://10.0.2.2:7190').getOneSubPreg(newSubPregunta);
+                  SubPregunta? existingSubPregunta = await ApiServiceSubPreguntas('https://api.encuesta.opret.gob.do').getOneSubPreg(newSubPregunta);
 
                   if (existingSubPregunta != null) {
                     showDialog(
@@ -1339,7 +1339,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                   );
 
                   try{
-                    final response = await ApiServiceSubPreguntas('https://10.0.2.2:7190').postSubPreg(nuevaSubPregunta);
+                    final response = await ApiServiceSubPreguntas('https://api.encuesta.opret.gob.do').postSubPreg(nuevaSubPregunta);
 
                     if(response.statusCode == 201) {
                       print('Las sub-Preguntas fue creado con éxito');
@@ -1427,7 +1427,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                   );
 
                   try{
-                    final response = await ApiServiceSubPreguntas('https://10.0.2.2:7190')
+                    final response = await ApiServiceSubPreguntas('https://api.encuesta.opret.gob.do')
                       .putSubPreg(subQuestionUpLoad.codSubPregunta, nuevaSubPregunta);
 
                     if(response.statusCode == 204) {
@@ -1481,7 +1481,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
               onPressed: () async {
                 // Llamar al servicio de eliminación
                 try {
-                  final response = await ApiServiceSubPreguntas('https://10.0.2.2:7190')
+                  final response = await ApiServiceSubPreguntas('https://api.encuesta.opret.gob.do')
                       .deleteSubPreg(subQuestionDelete.codSubPregunta);
                   if (response.statusCode == 204) {
                     print('Sub pregunta eliminado con éxito');
@@ -1791,7 +1791,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                   print('Resultados ${nuevaSesion}');
 
                   try{
-                    final response = await ApiServiceSesion('https://10.0.2.2:7190').postSesion(nuevaSesion);
+                    final response = await ApiServiceSesion('https://api.encuesta.opret.gob.do').postSesion(nuevaSesion);
 
                     if(response.statusCode == 201) {
                       print('La Sesion fue creado con éxito');
@@ -2060,7 +2060,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                   print('Resultados de sesionUpLoad: $sesionUpLoad');
 
                   try{
-                    final response = await ApiServiceSesion('https://10.0.2.2:7190')
+                    final response = await ApiServiceSesion('https://api.encuesta.opret.gob.do')
                       .putSesion(sectionUpload.idSesion!, sesionUpLoad);
 
                     if(response.statusCode == 204) {
@@ -2112,7 +2112,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                   fontWeight: FontWeight.bold)),
               onPressed: () async {
                 try{
-                  final response = await ApiServiceSesion('https://10.0.2.2:7190').deleteSesion(sectionDelete.idSesion!);
+                  final response = await ApiServiceSesion('https://api.encuesta.opret.gob.do').deleteSesion(sectionDelete.idSesion!);
 
                   if (response.statusCode == 204) {
                     print('Sesion eliminado con éxito');
@@ -2156,7 +2156,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
       print('Estado actualizado a: ${estadoActualizador.estado}');
 
       try{
-        final response = await ApiServiceSesion('https://10.0.2.2:7190')
+        final response = await ApiServiceSesion('https://api.encuesta.opret.gob.do')
           .putSesion(actualizarEstado_Sesion.idSesion!, estadoActualizador);
 
         if (estadoActualizador.estado) { // dependiento del valor del campo estado aparecera un cuadro de dialoga que notifica que se ha habilitado o deshabilitado de la encuesta
@@ -2205,7 +2205,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
           rango: sesion.rango,
         );
 
-        final response = await ApiServiceSesion('https://10.0.2.2:7190').putSesion(sesion.idSesion!, sesionEstadoActualizador);
+        final response = await ApiServiceSesion('https://api.encuesta.opret.gob.do').putSesion(sesion.idSesion!, sesionEstadoActualizador);
 
         if (sesionEstadoActualizador.estado) {
           if (response.statusCode == 204) {
