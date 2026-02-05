@@ -1220,7 +1220,7 @@ class _UsuariosDataSource extends DataTableSource {
         DataCell(Text(usuario.nombreApellido, style: TextStyle(fontSize: isTabletDevice ? 9.5.sp : 14.sp))),
         DataCell(Text(usuario.usuario1, style: TextStyle(fontSize: isTabletDevice ? 9.5.sp : 14.sp))),
         DataCell(Text(usuario.email, style: TextStyle(fontSize: isTabletDevice ? 9.5.sp : 14.sp))),
-        DataCell(usuario.fechaCreacion != null ? Text(usuario.fechaCreacion!.toString().substring(0, 10), style: TextStyle(fontSize: isTabletDevice ? 9.5.sp : 14.sp)) : const Text('')),
+        DataCell(usuario.fechaCreacion != null ? Text(usuario.fechaCreacion!.toString(), style: TextStyle(fontSize: isTabletDevice ? 9.5.sp : 14.sp)) : const Text('')),
         // DataCell(Text(usuario.fechaCreacion != null ? usuario.fechaCreacion.toString().substring(0, 10) : '-', style: TextStyle(fontSize: isTabletDevice ? 9.5.sp : 14.sp))),
         DataCell(Text(usuario.rol, style: TextStyle(fontSize: isTabletDevice ? 9.5.sp : 14.sp))),
         DataCell(
