@@ -39,4 +39,20 @@ class ApiServiceFormRegistro {
       throw Exception('No se pudo conectar a la API');
     }
   }
+
+  Future<List<Formulario>> getFormulario() async {
+    final isCheckOk = await service.check();
+
+    if(isCheckOk) {
+      try{
+        final response = await service.getAllData('Formularios');
+        return response.map((json) => Formulario.fromJson(json)).toList();
+      } catch(e) {
+        print('Error al cargar los formularios: $e');
+        rethrow;
+      }
+    } else {
+      throw Exception('No se pudo conectar a la API');
+    }
+  }
 }

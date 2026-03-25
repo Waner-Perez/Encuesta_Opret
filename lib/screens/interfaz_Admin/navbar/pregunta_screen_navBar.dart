@@ -4,10 +4,12 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
+import 'package:formulario_opret/models/Stored%20Procedure/sp_Filtrar_Respuestas.dart';
 import 'package:formulario_opret/models/dto_ShowQuestions.dart';
 import 'package:formulario_opret/models/pregunta.dart';
 import 'package:formulario_opret/screens/interfaz_Admin/navbar/navbar.dart';
 import 'package:formulario_opret/services/pregunta_services.dart';
+import 'package:formulario_opret/services/respuestas_services.dart';
 import 'package:formulario_opret/services/sesion_services.dart';
 import 'package:formulario_opret/services/subPreguntas_services.dart';
 import 'package:formulario_opret/widgets/input_decoration.dart';
@@ -63,6 +65,8 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
   List<DtoShowQuestions> _todosCampSesion = [];
   String selectedFilterSesion = 'Numero de Seccion';
   //------------------------------------------------------------------------------------------------------------------------
+  final ApiServiceRespuesta _apiServiceRespuesta =  ApiServiceRespuesta('https://api.encuesta.opret.gob.do');
+  List<SpFiltrarRespuestas> _respuestasFiltrada = [];
 
   @override
   void initState(){
@@ -179,10 +183,12 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
   Future<void> _refreshSesion() async {
     // final se = await _apiServiceSesion.getSesion();
     final se = await _apiServiceSesion2.getDtoShowQuestionsListada();
+    final respuestas = await _apiServiceRespuesta.getRespuestas();
 
     setState(() {
       _sesionFiltrada = se;
       _todosCampSesion = se;
+      _respuestasFiltrada = respuestas;
       // _sesionData = Future.value(se);
       _dtoShowQuestionsData = Future.value(se);
       //-----------------------------------------
@@ -472,7 +478,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                                       DataColumn(label: Text('Preguntas', style: TextStyle(fontSize: isTabletDevice ? 12.sp : 12.sp, color: Colors.white, fontWeight: FontWeight.bold))),
                                       DataColumn(label: Text('Accion', style: TextStyle(fontSize: isTabletDevice ? 12.sp : 12.sp, color: Colors.white, fontWeight: FontWeight.bold)))
                                     ],
-                                    source: _PreguntasDataSource(questionTable, _showEditDialog, _showDeleteDialog, isTabletDevice),
+                                    source: _PreguntasDataSource(questionTable, _sesionFiltrada, _showEditDialog, _showDeleteDialog, isTabletDevice),
                                     headingRowColor: WidgetStateProperty.all<Color>(const Color.fromARGB(255, 2, 37, 4)), // Fondo de encabezado
                                     rowsPerPage: 7, //numeros de filas
                                     columnSpacing: 50, //espacios entre columnas
@@ -657,7 +663,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                                       DataColumn(label: Text('Sub Preguntas', style: TextStyle(fontSize: isTabletDevice ? 12.sp : 12.sp, color: Colors.white, fontWeight: FontWeight.bold))),
                                       DataColumn(label: Text('Acción', style: TextStyle(fontSize: isTabletDevice ? 12.sp : 12.sp, color: Colors.white, fontWeight: FontWeight.bold)))
                                     ],
-                                    source: _SubPreguntasDataSource(subPregTabla, _showEditDialogSubPregunta, _showDeleteDialogSubPregunta, isTabletDevice),
+                                    source: _SubPreguntasDataSource(subPregTabla, _sesionFiltrada, _showEditDialogSubPregunta, _showDeleteDialogSubPregunta, isTabletDevice),
                                     headingRowColor: WidgetStateProperty.all<Color>(const Color.fromARGB(255, 2, 37, 4)), // Fondo de encabezado
                                     rowsPerPage: 7, //numeros de filas
                                     columnSpacing: 50, //espacios entre columnas
@@ -858,7 +864,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                                       DataColumn(label: Text('Enviar esta \npregunta a la \nencuesta.', style: TextStyle(fontSize: isTabletDevice ? 9.sp : 9.sp, color: Colors.white, fontWeight: FontWeight.bold))),
                                       DataColumn(label: Text('Acción', style: TextStyle(fontSize: isTabletDevice ? 9.sp : 9.sp, color: Colors.white, fontWeight: FontWeight.bold)))
                                     ],
-                                    source: _DtoShowQuestionsDataSource(sesionTable, onEditFromDto, onDeleteFromDto, onEstadoFromDto, isTabletDevice),
+                                    source: _DtoShowQuestionsDataSource(sesionTable, _respuestasFiltrada, onEditFromDto, onDeleteFromDto, onEstadoFromDto, isTabletDevice),
                                     headingRowColor: WidgetStateProperty.all<Color>(const Color.fromARGB(255, 2, 37, 4)), // Fondo de encabezado
                                     rowsPerPage: 5, //numeros de filas
                                     columnSpacing: 50, //espacios entre columnas
@@ -1777,6 +1783,13 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
             TextButton(
               onPressed: () async {
                 if (_formKey.currentState!.saveAndValidate()) {
+                  bool continueCreation = await _showContinueDialog(
+                    context, 
+                    "¿Está seguro de crear esta sección? Una vez creada, la pregunta y sub-pregunta quedarán vinculadas y no podrán eliminarse."
+                  );
+
+                  if(!continueCreation) return;
+
                   final dataSesion = _formKey.currentState!.value;
 
                   Sesion nuevaSesion = Sesion(
@@ -1796,7 +1809,7 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
                     if(response.statusCode == 201) {
                       print('La Sesion fue creado con éxito');
                       Navigator.of(context).pop();
-                      _showSuccessDialog(context, 'La Sección fue creado con éxito');
+                      _showSuccessDialog(context, 'La Sección fue creada con éxito.');
                       _refreshSesion();
                       
                     } else {
@@ -2297,6 +2310,91 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
     );
   }
 
+  Future<bool> _showContinueDialog(BuildContext context, String message) async {
+    final isTabletDevice = isTablet(context);
+    return await showDialog(
+      context: context, 
+      builder: (context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 25, horizontal: 40),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(15),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.5),
+                  spreadRadius: 5,
+                  blurRadius: 7,
+                  offset: const Offset(0, 3)
+                )
+              ]
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.warning_rounded, color: Color.fromARGB(255, 255, 196, 1), size: 60.0),
+                const SizedBox(height: 20),
+                const Text(
+                  'Advertencia!',
+                  style: TextStyle(
+                      fontSize: 30.0, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 8.0),
+                Text(
+                  message,
+                  style: TextStyle(fontSize: isTabletDevice ? 13.sp : 13.sp),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 24.0),
+                Flex(
+                  direction: isTabletDevice ? Axis.horizontal : Axis.vertical,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () => Navigator.of(context).pop(false),
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 45, vertical: 15),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(50),
+                        ),
+                      ),
+                      child: Text('Cancelar',
+                        style: TextStyle(
+                          fontSize: isTabletDevice ? 10.sp : 10.sp,
+                          color: const Color.fromARGB(255, 243, 33, 33)
+                        )
+                      ),
+                    ),
+                    const SizedBox(height: 10.0, width: 10.0),
+                    ElevatedButton(
+                      onPressed: () => Navigator.of(context).pop(true),
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 40, vertical: 15),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(50),
+                        ),
+                      ),
+                      child: Text('Continuar',
+                        style: TextStyle(
+                            fontSize: isTabletDevice ? 10.sp : 10.sp,
+                            color: const Color.fromARGB(255, 184, 135, 0)
+                        )
+                      )
+                    ),
+                  ],
+                )
+              ],
+            )
+          )
+        );
+      }
+    ) ?? false;
+  }
+
   // cuadro de acceso exito
   void _showSuccessDialog(BuildContext context, String message) {
     showDialog(
@@ -2414,17 +2512,19 @@ class _PreguntaScreenNavbarState extends State<PreguntaScreenNavbar> {
 
 class _PreguntasDataSource extends DataTableSource {
   final List<Preguntas> preguntasData;
+  final List<DtoShowQuestions> _sesionRelation;
   final Function(Preguntas) onEdit;
   final Function(Preguntas) onDelete;
   final bool isTabletDevice;
 
-  _PreguntasDataSource(this.preguntasData, this.onEdit, this.onDelete, this.isTabletDevice);
+  _PreguntasDataSource(this.preguntasData, this._sesionRelation, this.onEdit, this.onDelete, this.isTabletDevice);
 
   @override
   DataRow getRow(int index) {
     if (index >= preguntasData.length) return const DataRow(cells: []);
 
     final ask = preguntasData[index];
+    final bool existRelation = _sesionRelation.any((s) => s.codPreguntaDto == ask.codPregunta);
 
     return DataRow(
       color: WidgetStateProperty.resolveWith<Color>((states) {
@@ -2452,13 +2552,16 @@ class _PreguntasDataSource extends DataTableSource {
                 icon: const Icon(Icons.edit, color: Colors.blue),
               ),
               
-              IconButton(
-                onPressed: () {
-                  // _showDeleteDialog(ask);
-                  onDelete(ask);
-                },
-                icon: const Icon(Icons.delete, color: Colors.red)
-              )
+              if(!existRelation)
+                IconButton(
+                  onPressed: () {
+                    // _showDeleteDialog(ask);
+                    onDelete(ask);
+                  },
+                  icon: const Icon(Icons.delete, color: Colors.red)
+                )
+              else
+                const SizedBox.shrink(), // Oculta el botón de eliminar si existe una relación
             ],
           )
         )
@@ -2478,17 +2581,19 @@ class _PreguntasDataSource extends DataTableSource {
 
 class _SubPreguntasDataSource extends DataTableSource {
   final List<SubPregunta> _subPreguntasData;
+  final List<DtoShowQuestions> _sesionRelation;
   final Function(SubPregunta) onEdit;
   final Function(SubPregunta) onDelete;
   final bool isTabletDevice;
 
-  _SubPreguntasDataSource(this._subPreguntasData, this.onEdit, this.onDelete, this.isTabletDevice);
+  _SubPreguntasDataSource(this._subPreguntasData, this._sesionRelation, this.onEdit, this.onDelete, this.isTabletDevice);
 
   @override
   DataRow getRow(int index) {
     if (index >= _subPreguntasData.length) return const DataRow(cells: []);
 
     final sub = _subPreguntasData[index];
+    final bool existRelation = _sesionRelation.any((s) => s.codSubPreguntaDto == sub.codSubPregunta);
 
     return DataRow(
       color: WidgetStateProperty.resolveWith<Color>((states) {
@@ -2514,14 +2619,16 @@ class _SubPreguntasDataSource extends DataTableSource {
                 icon: const Icon(Icons.edit, color: Colors.blue),
               ),
               
-              IconButton(
-                onPressed: () {
-                  // _showDeleteDialogSubPregunta(sub);
-                  onDelete(sub);
-                },
-                icon: const Icon(Icons.delete, color: Colors.red)
-              )
-            ],
+              if(!existRelation)
+                IconButton(
+                  onPressed: () {
+                    // _showDeleteDialogSubPregunta(sub);
+                    onDelete(sub);
+                  },
+                  icon: const Icon(Icons.delete, color: Colors.red)
+                )
+              else const SizedBox.shrink()
+            ]
           )
         )
       ]
@@ -2540,18 +2647,24 @@ class _SubPreguntasDataSource extends DataTableSource {
 
 class _DtoShowQuestionsDataSource extends DataTableSource {
   final List<DtoShowQuestions> _dtoShowQuestionsData;
+  final List<SpFiltrarRespuestas> _responsesRelation;
   final Function(DtoShowQuestions) onEdit;
   final Function(DtoShowQuestions) onDelete;
   final Function(DtoShowQuestions) _estado;
   final bool isTabletDevice;
 
-  _DtoShowQuestionsDataSource(this._dtoShowQuestionsData, this.onEdit, this.onDelete, this._estado, this.isTabletDevice);
+  _DtoShowQuestionsDataSource(this._dtoShowQuestionsData, this._responsesRelation, this.onEdit, this.onDelete, this._estado, this.isTabletDevice);
 
   @override
   DataRow getRow(int index) {
     if (index >= _dtoShowQuestionsData.length) return const DataRow(cells: []);
 
     final section = _dtoShowQuestionsData[index];
+    final bool existRelationResponses = _responsesRelation.any((r) => 
+      r.sp_IdSesion != null &&
+      section.idSesionDto != null &&
+      r.sp_IdSesion == section.idSesionDto
+    );
 
     return DataRow(
       color: WidgetStateProperty.resolveWith<Color>((states) {
@@ -2600,13 +2713,13 @@ class _DtoShowQuestionsDataSource extends DataTableSource {
                   onEdit(section);
                 }, 
                 icon: const Icon(Icons.edit, color: Colors.blue),
-              ),      
-              IconButton(
-                onPressed: () {
-                  onDelete(section);
-                },
-                icon: const Icon(Icons.delete, color: Colors.red)
-              )
+              ),   
+              if(!existRelationResponses)   
+                IconButton(
+                  onPressed: () => onDelete(section),                  
+                  icon: const Icon(Icons.delete, color: Colors.red)
+                )
+              else const SizedBox.shrink()
             ],
           )
         )

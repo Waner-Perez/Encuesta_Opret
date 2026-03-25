@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
+import 'package:formulario_opret/models/Stored%20Procedure/sp_Filtrar_Respuestas.dart';
 import 'package:formulario_opret/models/usuarios.dart';
 import 'package:formulario_opret/screens/interfaz_Admin/navbar/navbar.dart';
+import 'package:formulario_opret/services/respuestas_services.dart';
 import 'package:formulario_opret/services/user_services.dart';
 import 'package:formulario_opret/widgets/input_decoration.dart';
 // import 'package:intl/intl.dart';
@@ -30,6 +32,8 @@ class RegistroEmpl extends StatefulWidget {
 class _RegistroEmplState extends State<RegistroEmpl> {
   final ApiServiceUser _apiServiceUser = ApiServiceUser('https://api.encuesta.opret.gob.do'); // Cambia por tu URL
   late Future<List<Usuarios>> _usuariosdata;
+  final ApiServiceRespuesta _apiServiceRespuesta =  ApiServiceRespuesta('https://api.encuesta.opret.gob.do');
+  List<SpFiltrarRespuestas> _respuestasFiltrada = [];
   final TextEditingController datePicker = TextEditingController();
   final TextEditingController searchController = TextEditingController();
   Usuarios? usuariosFiltrados;
@@ -48,14 +52,18 @@ class _RegistroEmplState extends State<RegistroEmpl> {
   }
 
   Future<void> _loadUsuarios() async {
+    final respuestas = await _apiServiceRespuesta.getRespuestas();
+
     setState(() {
       _usuariosdata = _apiServiceUser.getUsuarios();
+      _respuestasFiltrada = respuestas;
     });
   }
 
   void _refreshUsuarios() {
     setState(() {
       _usuariosdata = _apiServiceUser.getUsuarios();
+      // _respuestasFiltrada = _apiServiceRespuesta.getRespuestas() as List<SpFiltrarRespuestas>;
     });
   }
 
@@ -339,7 +347,7 @@ class _RegistroEmplState extends State<RegistroEmpl> {
                                   DataColumn(label: Text('Rol', style: TextStyle(fontSize: isTabletDevice ? 27 : 15.sp, color: Colors.white, fontWeight: FontWeight.bold))),
                                   DataColumn(label: Text('Accion', style: TextStyle(fontSize: isTabletDevice ? 27 : 15.sp, color: Colors.white, fontWeight: FontWeight.bold)))
                                 ],
-                                source: _UsuariosDataSource(usuariostabla, _showEditDialog, _showDeleteDialog, _selectedRowIndex, isTabletDevice),
+                                source: _UsuariosDataSource(usuariostabla, _respuestasFiltrada, _showEditDialog, _showDeleteDialog, _selectedRowIndex, isTabletDevice),
                                 rowsPerPage: isTabletDevice ? _filasPorPagina : 5, //numeros de filas
                                 columnSpacing: 30, //espacios entre columnas
                                 horizontalMargin: 50, //para aplicarle un margin horizontal a los campo de la tabla
@@ -1192,18 +1200,20 @@ class _RegistroEmplState extends State<RegistroEmpl> {
 
 class _UsuariosDataSource extends DataTableSource {
   final List<Usuarios> usuarios;
+  final List<SpFiltrarRespuestas> respRelations;
   final Function(Usuarios) onEdit;
   final Function(Usuarios) onDelete;
   final int? selectedRowIndex;
   final bool isTabletDevice;
 
-  _UsuariosDataSource(this.usuarios, this.onEdit, this.onDelete, this.selectedRowIndex, this.isTabletDevice);
+  _UsuariosDataSource(this.usuarios, this.respRelations, this.onEdit, this.onDelete, this.selectedRowIndex, this.isTabletDevice);
 
   @override
   DataRow getRow(int index) {
     if (index >= usuarios.length) return const DataRow(cells: []);
 
     final usuario = usuarios[index];
+    final existUserAndResp = respRelations.any((resp) => resp.sp_IdUsuarios == usuario.idUsuarios);
 
     return DataRow(
       selected: selectedRowIndex == index, // Resaltar si es la fila seleccionada
@@ -1233,14 +1243,15 @@ class _UsuariosDataSource extends DataTableSource {
                   onEdit(usuario);
                 },
               ),
-
-              IconButton(
-                onPressed: () {
-                  // _showDeleteDialog(usuario);
-                  onDelete(usuario);
-                }, 
-                icon: const Icon(Icons.delete, color: Colors.red)
-              )
+              if(!existUserAndResp && usuario.rol != "Administrador")
+                IconButton(
+                  onPressed: () {
+                    // _showDeleteDialog(usuario);
+                    onDelete(usuario);
+                  }, 
+                  icon: const Icon(Icons.delete, color: Colors.red)
+                )
+              else const SizedBox.shrink()
             ],
           )
         )

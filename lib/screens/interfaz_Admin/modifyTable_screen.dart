@@ -4,9 +4,11 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
+import 'package:formulario_opret/models/Stored%20Procedure/sp_Filtrar_FormRegistro.dart';
 import 'package:formulario_opret/models/formulario_Registro.dart';
 import 'package:formulario_opret/screens/interfaz_Admin/navbar/navbar.dart';
 import 'package:formulario_opret/services/estacion_services.dart';
+import 'package:formulario_opret/services/form_Registro_services.dart';
 import 'package:formulario_opret/services/linea_services.dart';
 import 'package:formulario_opret/widgets/input_decoration.dart';
 
@@ -34,6 +36,8 @@ class _ModifyTableState extends State<ModifyTable> {
   late Future<List<Linea>> _lineaData;
   final ApiServiceEstacion _apiServiceEstacion = ApiServiceEstacion('https://api.encuesta.opret.gob.do');
   late Future<List<Estacion>> _estacionData;
+  final ApiServiceFormRegistro _apiServiceFormRegistro = ApiServiceFormRegistro('https://api.encuesta.opret.gob.do');
+  List<Formulario> _formRelations = [];
   String _selectedLinea = 'Linea Metro';
   String? _savedLinea;
   Offset position = const Offset(500, 800); // Posición inicial del botón
@@ -81,6 +85,7 @@ class _ModifyTableState extends State<ModifyTable> {
 
       final line = await _apiServiceLineas.getLinea();
       final station = await _apiServiceEstacion.getEstacion();
+      final form = await _apiServiceFormRegistro.getFormulario();
 
       setState(() {
         _lineaFiltrada = line;
@@ -92,6 +97,7 @@ class _ModifyTableState extends State<ModifyTable> {
         _estacionData = Future.value(station);
 
         _lineas = lineas;
+        _formRelations = form;
         print('Lineas obtenidas: $_lineas');
       });
     } catch (e) {
@@ -313,7 +319,7 @@ class _ModifyTableState extends State<ModifyTable> {
                                         DataColumn(label: Text('Nombre de \nla Línea', style: TextStyle(fontSize: isTabletDevice ? 12.sp : 12.sp, color: Colors.white, fontWeight: FontWeight.bold))),
                                         DataColumn(label: Text('Acción', style: TextStyle(fontSize: isTabletDevice ? 12.sp : 12.sp, color: Colors.white, fontWeight: FontWeight.bold)))
                                       ],
-                                      source: _LineaDataSource(lineTable, _showEditDialogLinea, _showDeleteDialogLinea),
+                                      source: _LineaDataSource(lineTable, _estacionFiltrada, _showEditDialogLinea, _showDeleteDialogLinea),
                                       rowsPerPage: 5, //numeros de filas
                                       columnSpacing: 50, //espacios entre columnas
                                       horizontalMargin: 50, //para aplicarle un margin horizontal a los campo de la tabla
@@ -446,7 +452,7 @@ class _ModifyTableState extends State<ModifyTable> {
                                         DataColumn(label: Text('Estación', style: TextStyle(fontSize: isTabletDevice ? 12.sp : 12.sp, color: Colors.white, fontWeight: FontWeight.bold))),
                                         DataColumn(label: Text('Acción', style: TextStyle(fontSize: isTabletDevice ? 12.sp : 12.sp, color: Colors.white, fontWeight: FontWeight.bold)))
                                       ],
-                                      source: _EstacionDataSource(station, _showEditDialogEstacion, _showDeleteDialogEstacion),
+                                      source: _EstacionDataSource(station, _formRelations, _showEditDialogEstacion, _showDeleteDialogEstacion),
                                       rowsPerPage: 5, //numeros de filas
                                       columnSpacing: 50, //espacios entre columnas
                                       horizontalMargin: 50, //para aplicarle un margin horizontal a los campo de la tabla
@@ -968,48 +974,48 @@ class _ModifyTableState extends State<ModifyTable> {
   FormBuilderTextField labelEstacion() {
     final isTabletDevice = isTablet(context);
     return FormBuilderTextField(
-                  name: 'Estacion',
-                  // keyboardType: TextInputType.number,
-                  decoration: InputDecorations.inputDecoration(
-                    labeltext: 'Nombre de Estación',
-                    labelFrontSize: isTabletDevice ? 15.sp : 15.sp,
-                    hintext: 'Ingrese la nueva Estación',
-                    hintFrontSize: isTabletDevice ? 10.sp : 10.sp,
-                    icono: Icon(Icons.text_fields, size: isTabletDevice ? 15.sp : 15.sp),
-                    errorSize: isTabletDevice ? 10.sp : 10.sp,
-                  ),
-                  style: TextStyle(fontSize: isTabletDevice ? 11.5.sp : 11.5.sp, color: const Color.fromARGB(255, 1, 1, 1)),
-                  validator: FormBuilderValidators.required(errorText: 'Este campo es requerido')
-                );
+      name: 'Estacion',
+      // keyboardType: TextInputType.number,
+      decoration: InputDecorations.inputDecoration(
+        labeltext: 'Nombre de Estación',
+        labelFrontSize: isTabletDevice ? 15.sp : 15.sp,
+        hintext: 'Ingrese la nueva Estación',
+        hintFrontSize: isTabletDevice ? 10.sp : 10.sp,
+        icono: Icon(Icons.text_fields, size: isTabletDevice ? 15.sp : 15.sp),
+        errorSize: isTabletDevice ? 10.sp : 10.sp,
+      ),
+      style: TextStyle(fontSize: isTabletDevice ? 11.5.sp : 11.5.sp, color: const Color.fromARGB(255, 1, 1, 1)),
+      validator: FormBuilderValidators.required(errorText: 'Este campo es requerido')
+    );
   }
 
   FormBuilderDropdown<String> selectorLinea() {
     final isTabletDevice = isTablet(context);
     return FormBuilderDropdown<String>(
-                  name: 'idLinea',
-                  menuMaxHeight: 200.0,
-                  decoration: InputDecorations.inputDecoration(
-                    labeltext: 'Elige Linea de metro',
-                    labelFrontSize: isTabletDevice ? 15.sp : 15.sp,
-                    icono: Icon(Icons.list_rounded, size: isTabletDevice ? 15.sp : 15.sp),
-                    errorSize: isTabletDevice ? 10.sp : 10.sp,
-                  ),
-                  validator: FormBuilderValidators.required(errorText: 'Este campo es requerido'),
-                  // initialValue: _savedLinea,
-                  items: _lineas.map((linea) {
-                    return DropdownMenuItem(
-                      value: linea.idLinea,
-                      child: Text(linea.nombreLinea),
-                    );
-                  }).toList(),
-                  style: TextStyle(fontSize: isTabletDevice ? 11.5.sp : 11.5.sp, color: const Color.fromARGB(255, 1, 1, 1)),
-                  onChanged: (value) {
-                    setState(() {
-                      _savedLinea = value!;
-                      print('Línea seleccionada: $_savedLinea'); // Depuración
-                    });
-                  },
-                );
+      name: 'idLinea',
+      menuMaxHeight: 200.0,
+      decoration: InputDecorations.inputDecoration(
+        labeltext: 'Elige Linea de metro',
+        labelFrontSize: isTabletDevice ? 15.sp : 15.sp,
+        icono: Icon(Icons.list_rounded, size: isTabletDevice ? 15.sp : 15.sp),
+        errorSize: isTabletDevice ? 10.sp : 10.sp,
+      ),
+      validator: FormBuilderValidators.required(errorText: 'Este campo es requerido'),
+      // initialValue: _savedLinea,
+      items: _lineas.map((linea) {
+        return DropdownMenuItem(
+          value: linea.idLinea,
+          child: Text(linea.nombreLinea),
+        );
+      }).toList(),
+      style: TextStyle(fontSize: isTabletDevice ? 11.5.sp : 11.5.sp, color: const Color.fromARGB(255, 1, 1, 1)),
+      onChanged: (value) {
+        setState(() {
+          _savedLinea = value!;
+          print('Línea seleccionada: $_savedLinea'); // Depuración
+        });
+      },
+    );
   }
   //-----------------------------------------------------------------------------------------------------------------------------
 
@@ -1269,16 +1275,18 @@ class _ModifyTableState extends State<ModifyTable> {
 
 class _LineaDataSource extends DataTableSource {
   final List<Linea> lineasData;
+  final List<Estacion> _stationsRelated;
   final Function(Linea) onEdit;
   final Function(Linea) onDelete;
 
-  _LineaDataSource(this.lineasData, this.onEdit, this.onDelete);
+  _LineaDataSource(this.lineasData, this._stationsRelated, this.onEdit, this.onDelete);
 
   @override
   DataRow getRow(int index) {
     if (index >= lineasData.length) return const DataRow(cells: []);
 
     final linasDatos = lineasData[index];
+    final bool existStateAndLineRelation = _stationsRelated.any((state) => state.idLinea == linasDatos.idLinea);
 
     return DataRow(
       color: WidgetStateProperty.resolveWith<Color>((states) {
@@ -1301,14 +1309,15 @@ class _LineaDataSource extends DataTableSource {
                 }, 
                 icon: const Icon(Icons.edit, color: Colors.blue),
               ),
-              
-              IconButton(
-                onPressed: () {
-                  // _showDeleteDialogLinea(linasDatos);
-                  onDelete(linasDatos);
-                },
-                icon: const Icon(Icons.delete, color: Colors.red)
-              )
+              if(!existStateAndLineRelation)
+                IconButton(
+                  onPressed: () {
+                    // _showDeleteDialogLinea(linasDatos);
+                    onDelete(linasDatos);
+                  },
+                  icon: const Icon(Icons.delete, color: Colors.red)
+                )
+              else const SizedBox.shrink()
             ],
           )
         )
@@ -1328,16 +1337,22 @@ class _LineaDataSource extends DataTableSource {
 
 class _EstacionDataSource extends DataTableSource {
   final List<Estacion> estacionData;
+  final List<Formulario> _formRelations;
   final Function(Estacion) onEdit;
   final Function(Estacion) onDelete;
 
-  _EstacionDataSource(this.estacionData, this.onEdit, this.onDelete);
+  _EstacionDataSource(this.estacionData, this._formRelations, this.onEdit, this.onDelete);
 
   @override
   DataRow? getRow(int index) {
     if (index >= estacionData.length) return const DataRow(cells: []);
 
     final estacion = estacionData[index];
+    final bool existFormAndStationRelation = _formRelations.any((form) =>
+      // form.idEstacionForm != null &&
+      // estacion.idEstacion != null &&
+      form.idEstacionForm == estacion.idEstacion
+    );
 
     return DataRow(
       color: WidgetStateProperty.resolveWith<Color>((states) {
@@ -1384,7 +1399,8 @@ class _EstacionDataSource extends DataTableSource {
         buildActionCell(
           onEdit: onEdit, 
           onDelete: onDelete, 
-          estacion: estacion
+          estacion: estacion,
+          existFormAndStationRelation: existFormAndStationRelation
         )
       ]
     );
@@ -1408,7 +1424,8 @@ class _EstacionDataSource extends DataTableSource {
   DataCell buildActionCell({
     required Function(Estacion) onEdit,
     required Function(Estacion) onDelete,
-    required Estacion estacion, // Objeto que será pasado a las funciones
+    required Estacion estacion, 
+    required bool existFormAndStationRelation,
   }) {
     return DataCell(
       Row(
@@ -1417,10 +1434,12 @@ class _EstacionDataSource extends DataTableSource {
             onPressed: () => onEdit(estacion), // Pasa el objeto `estacion` a la función de edición
             icon: const Icon(Icons.edit, color: Colors.blue),
           ),
-          IconButton(
-            onPressed: () => onDelete(estacion), // Pasa el objeto `estacion` a la función de eliminación
-            icon: const Icon(Icons.delete, color: Colors.red),
-          ),
+          if(!existFormAndStationRelation)
+            IconButton(
+              onPressed: () => onDelete(estacion), // Pasa el objeto `estacion` a la función de eliminación
+              icon: const Icon(Icons.delete, color: Colors.red),
+            )
+          else const SizedBox.shrink()
         ]
       )
     );

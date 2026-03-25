@@ -32,3 +32,20 @@ class SpFiltrarFormRegistro {
     );
   }
 }
+
+class Formulario {
+  // String? idLineaForm;
+  int? idEstacionForm;
+
+  Formulario({
+    // this.idLineaForm,
+    this.idEstacionForm
+  });
+
+  factory Formulario.fromJson(Map<String, dynamic> json) {
+    return Formulario(
+      // idLineaForm: json['idLinea'],
+      idEstacionForm: json['idEstacion']
+    );
+  }
+}
