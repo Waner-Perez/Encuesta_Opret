@@ -179,8 +179,25 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                       width: double.infinity,
                       child: ElevatedButton(
                           onPressed: () {
-                            _showWarning(context,
-                                'Ten en cuenta que deberás llenar el formulario nuevamente para acceder a esta pantalla.');
+                            // _showWarning(context,
+                            //     'Ten en cuenta que deberás llenar el formulario nuevamente para acceder a esta pantalla. \n\nTambien debes de tener conexión a internet para que se sincronicen los datos, puedas ver las preguntas de encuestas y enviar las respuestas al servidor. \n\nAntes de salir, asegurarte de haber recargado la página. ¿Deseas continuar?');
+                            _showWarning(
+                              context,
+                              RichText(
+                                textAlign: TextAlign.center,
+                                text: const TextSpan(
+                                  style: TextStyle(color: Colors.black, fontSize: 26),
+                                  children: [
+                                    TextSpan(
+                                      text: 'Ten en cuenta que deberás llenar el formulario de línea y estación en la que te encuentras nuevamente para acceder a esta pantalla.\n\n'
+                                    ),
+                                    TextSpan(
+                                      text: '¿Deseas continuar?',
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color.fromRGBO(1, 135, 76, 1),
@@ -1054,7 +1071,7 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
         });
   }
 
-  void _showWarning(BuildContext context, String message) {
+  void _showWarning(BuildContext context, dynamic message) {
     final isTabletDevice = isTablet(context);
     showDialog(
         context: context,
@@ -1085,12 +1102,14 @@ class _PreguntaEncuestaScreenState extends State<PreguntaEncuestaScreen> {
                           fontSize: 30.0, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 8.0),
-                    Text(
-                      message,
-                      style:
-                          TextStyle(fontSize: isTabletDevice ? 13.sp : 13.sp),
-                      textAlign: TextAlign.center,
-                    ),
+                    message is String
+                        ? Text(
+                            message,
+                            style: TextStyle(
+                                fontSize: isTabletDevice ? 13.sp : 13.sp),
+                            textAlign: TextAlign.center,
+                          )
+                        : message,
                     const SizedBox(height: 24.0),
                     Flex(
                       direction:
