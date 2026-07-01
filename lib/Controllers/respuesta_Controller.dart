@@ -1,3 +1,4 @@
+import 'package:formulario_opret/config/app_config.dart';
 import 'package:formulario_opret/data/respuesta_crud.dart';
 import 'package:formulario_opret/data/stored_Respuestas_crud.dart';
 import 'package:formulario_opret/models/Stored%20Procedure/sp_Insertar_Respuestas.dart';
@@ -7,8 +8,8 @@ import 'package:formulario_opret/services/respuestas_services.dart';
 class RespuestaController {
   final RespuestaCrud _respuestaCrud = RespuestaCrud();
   final StoredRespuestasCrud _storedRespuestasCrud = StoredRespuestasCrud();
-  final ApiServiceRespuesta _apiServiceRespuesta = ApiServiceRespuesta('https://api.encuesta.opret.gob.do');
-  final StreamServices _streamServices = StreamServices('https://api.encuesta.opret.gob.do');
+  final ApiServiceRespuesta _apiServiceRespuesta = ApiServiceRespuesta(AppConfig.apiUrl);
+  final StreamServices _streamServices = StreamServices(AppConfig.apiUrl);
 
   RespuestaController() {
     _streamServices.backendAvailabilityStream.listen((isAvailable) {

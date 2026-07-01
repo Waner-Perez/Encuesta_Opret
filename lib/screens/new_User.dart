@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
+import 'package:formulario_opret/config/app_config.dart';
 import 'package:formulario_opret/models/usuarios.dart';
 import 'package:formulario_opret/screens/login_Screen.dart';
 import 'package:formulario_opret/screens/presentation_screen.dart';
@@ -36,7 +37,7 @@ class _NewUserState extends State<NewUser> {
   // final UpperCaseTextEditingController _controller = UpperCaseTextEditingController(); 
   final TextEditingController datePicker = TextEditingController();
   // DateTime? _selectedDate;
-  final ApiServiceUser _apiServiceUser = ApiServiceUser('https://api.encuesta.opret.gob.do');
+  final ApiServiceUser _apiServiceUser = ApiServiceUser(AppConfig.apiUrl);
   bool _obscureText = true;
   bool isLoading = false; // Variable de control para el cuadro de carga
   // bool hasError = true; // Variable de control para el cuadro de Error de carga

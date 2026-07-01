@@ -22,7 +22,7 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  // final ApiServiceToken _apiServiceToken = ApiServiceToken('https://api.encuesta.opret.gob.do',false);
+  // final ApiServiceToken _apiServiceToken = ApiServiceToken(AppConfig.apiUrl,false);
 
   @override
   Widget build(BuildContext context) {

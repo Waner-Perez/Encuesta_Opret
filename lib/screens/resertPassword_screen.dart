@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
+import 'package:formulario_opret/config/app_config.dart';
 import 'package:formulario_opret/models/resertPassword.dart';
 import 'package:formulario_opret/screens/forgotPassword_screen.dart';
 import 'package:formulario_opret/screens/login_Screen.dart';
@@ -25,7 +26,7 @@ class ResertpasswordScreen extends StatefulWidget {
 
 class _ResertpasswordScreenState extends State<ResertpasswordScreen> {
   final _formkey = GlobalKey<FormBuilderState>();
-  final ApiResertPasswordServices _resert = ApiResertPasswordServices('https://api.encuesta.opret.gob.do');
+  final ApiResertPasswordServices _resert = ApiResertPasswordServices(AppConfig.apiUrl);
   bool _obscureText = true;
   bool _obscureTextConfirm = true;
 

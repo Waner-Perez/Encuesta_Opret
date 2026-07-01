@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:formulario_opret/config/app_config.dart';
 import 'package:formulario_opret/screens/interfaz_User/Empleado_screen.dart';
 import 'package:formulario_opret/screens/interfaz_User/form_Encuesta_Screen.dart';
 import 'package:formulario_opret/screens/interfaz_User/welcome_screen.dart';
@@ -27,7 +28,7 @@ class NavbarEmpl extends StatefulWidget {
 class _NavbarEmplState extends State<NavbarEmpl> {
   @override
   Widget build(BuildContext context) {
-    final ApiServiceToken _apiServiceToken = ApiServiceToken('https://api.encuesta.opret.gob.do',false);
+    final ApiServiceToken _apiServiceToken = ApiServiceToken(AppConfig.apiUrl,false);
 
     return Drawer(
       child: ListView(

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
+import 'package:formulario_opret/config/app_config.dart';
 import 'package:formulario_opret/models/Stored%20Procedure/sp_Filtrar_Respuestas.dart';
 import 'package:formulario_opret/models/usuarios.dart';
 import 'package:formulario_opret/screens/interfaz_Admin/navbar/navbar.dart';
@@ -30,9 +31,9 @@ class RegistroEmpl extends StatefulWidget {
 }
 
 class _RegistroEmplState extends State<RegistroEmpl> {
-  final ApiServiceUser _apiServiceUser = ApiServiceUser('https://api.encuesta.opret.gob.do'); // Cambia por tu URL
+  final ApiServiceUser _apiServiceUser = ApiServiceUser(AppConfig.apiUrl); // Cambia por tu URL
   late Future<List<Usuarios>> _usuariosdata;
-  final ApiServiceRespuesta _apiServiceRespuesta =  ApiServiceRespuesta('https://api.encuesta.opret.gob.do');
+  final ApiServiceRespuesta _apiServiceRespuesta =  ApiServiceRespuesta(AppConfig.apiUrl);
   List<SpFiltrarRespuestas> _respuestasFiltrada = [];
   final TextEditingController datePicker = TextEditingController();
   final TextEditingController searchController = TextEditingController();

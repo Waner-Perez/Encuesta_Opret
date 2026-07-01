@@ -1,6 +1,7 @@
 // "mateapp" utilizado para importar de manera automatica el main()
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:formulario_opret/screens/forgotPassword_screen.dart';
 import 'package:formulario_opret/screens/interfaz_Admin/modifyTable_screen.dart';
 import 'package:formulario_opret/screens/interfaz_Admin/navbar/pregunta_screen_navBar.dart';
@@ -23,8 +24,9 @@ Future<void> getDatabasePath() async {
   print('Database path: $path');
 }
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: '.env');
   HttpOverrides.global = MyHttpOverrides();
   getDatabasePath();
 

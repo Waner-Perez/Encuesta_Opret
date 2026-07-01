@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:formulario_opret/config/app_config.dart';
 import 'package:formulario_opret/models/Stored%20Procedure/sp_Filtrar_FormRegistro.dart';
 import 'package:formulario_opret/screens/interfaz_Admin/navbar/navbar.dart';
 import 'package:formulario_opret/services/form_Registro_services.dart';
@@ -24,7 +25,7 @@ class ReportFormulario extends StatefulWidget {
 }
 
 class _ReportFormularioState extends State<ReportFormulario> {
-  final ApiServiceFormRegistro _apiServiceFormRegistro = ApiServiceFormRegistro('https://api.encuesta.opret.gob.do');
+  final ApiServiceFormRegistro _apiServiceFormRegistro = ApiServiceFormRegistro(AppConfig.apiUrl);
   late Future<List<SpFiltrarFormRegistro>> _formRegistroData;
   final TextEditingController searchController = TextEditingController();
   List<SpFiltrarFormRegistro> formFiltrados = [];

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:formulario_opret/config/app_config.dart';
 import 'package:formulario_opret/data/section_crud.dart';
 import 'package:formulario_opret/models/Stored%20Procedure/sp_preguntasCompleta.dart';
 import 'package:formulario_opret/services/Stream/stream_services.dart';
@@ -6,8 +7,8 @@ import 'package:formulario_opret/services/sesion_services.dart';
 
 class SectionController {
   final SectionCrud _sectionCrud = SectionCrud();
-  final ApiServiceSesion2 _apiServiceSesion2 = ApiServiceSesion2('https://api.encuesta.opret.gob.do');
-  final StreamServices _streamServices = StreamServices('https://api.encuesta.opret.gob.do');
+  final ApiServiceSesion2 _apiServiceSesion2 = ApiServiceSesion2(AppConfig.apiUrl);
+  final StreamServices _streamServices = StreamServices(AppConfig.apiUrl);
 
   SectionController() {
     _streamServices.backendAvailabilityStream.listen((isAvailable) {

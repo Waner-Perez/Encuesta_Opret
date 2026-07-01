@@ -25,7 +25,7 @@ class Sesion {
     return Sesion(
       idSesion: json['idSesion'],
       tipoRespuesta: json['tipoRespuesta'],
-        identifEncuesta: json['grupoTema'],
+      identifEncuesta: json['grupoTema'],
       codPregunta: json['codPregunta'],
       codSubPregunta: json['codSubPregunta'],
       rango: json['rango'],

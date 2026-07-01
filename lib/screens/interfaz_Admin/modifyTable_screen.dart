@@ -4,6 +4,7 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
+import 'package:formulario_opret/config/app_config.dart';
 import 'package:formulario_opret/models/Stored%20Procedure/sp_Filtrar_FormRegistro.dart';
 import 'package:formulario_opret/models/formulario_Registro.dart';
 import 'package:formulario_opret/screens/interfaz_Admin/navbar/navbar.dart';
@@ -32,11 +33,11 @@ class ModifyTable extends StatefulWidget {
 
 class _ModifyTableState extends State<ModifyTable> {
   final _formKey = GlobalKey<FormBuilderState>();
-  final ApiServiceLineas _apiServiceLineas = ApiServiceLineas('https://api.encuesta.opret.gob.do');
+  final ApiServiceLineas _apiServiceLineas = ApiServiceLineas(AppConfig.apiUrl);
   late Future<List<Linea>> _lineaData;
-  final ApiServiceEstacion _apiServiceEstacion = ApiServiceEstacion('https://api.encuesta.opret.gob.do');
+  final ApiServiceEstacion _apiServiceEstacion = ApiServiceEstacion(AppConfig.apiUrl);
   late Future<List<Estacion>> _estacionData;
-  final ApiServiceFormRegistro _apiServiceFormRegistro = ApiServiceFormRegistro('https://api.encuesta.opret.gob.do');
+  final ApiServiceFormRegistro _apiServiceFormRegistro = ApiServiceFormRegistro(AppConfig.apiUrl);
   List<Formulario> _formRelations = [];
   String _selectedLinea = 'Linea Metro';
   String? _savedLinea;
@@ -414,9 +415,22 @@ class _ModifyTableState extends State<ModifyTable> {
                                 print('Error al cargar la tabla de Estaciones del metro.: ${snapshot.error}');
                                 return Center(child: Text('"Lo sentimos, no pudimos cargar la información en este momento. \nPor favo, inténtalo nuevamente presionando el (botón Refrescar)"', style: TextStyle(fontSize: isTabletDevice ? 11.sp : 9.sp, fontWeight: FontWeight.bold)));
                               } else {
-                                final station = _estacionFiltrada.isNotEmpty 
+                                final stationRaw = _estacionFiltrada.isNotEmpty 
                                       ? _estacionFiltrada
                                       : snapshot.data ?? [];
+
+                                //Para ordenar las estaciones segun el orden
+                                final station = List<Estacion>.from(stationRaw)
+                                  ..sort((a, b) {
+                                    final ordenA = a.orden ?? 0;
+                                    final ordenB = b.orden ?? 0;
+
+                                    // if(ordenA == 0 && ordenB == 0) return 0;
+                                    if(ordenA == 0 && ordenB == 0) return a.idEstacion.compareTo(b.idEstacion);;
+                                    if(ordenA == 0) return 1;
+                                    if(ordenB == 0) return -1;
+                                    return ordenA.compareTo(ordenB);
+                                  });
                                 
                                 return Container(
                                   margin: const EdgeInsets.all(2.0),
@@ -448,6 +462,7 @@ class _ModifyTableState extends State<ModifyTable> {
                                       headingRowColor: WidgetStateProperty.all<Color>(const Color.fromARGB(255, 2, 37, 4)), // Fondo de encabezado
                                       columns: [
                                         DataColumn(label: Text('NO', style: TextStyle(fontSize: isTabletDevice ? 12.sp : 12.sp, color: Colors.white, fontWeight: FontWeight.bold))),
+                                        DataColumn(label: Text('Orden', style: TextStyle(fontSize: isTabletDevice ? 12.sp : 12.sp, color: Colors.white, fontWeight: FontWeight.bold))),
                                         DataColumn(label: Text('Id Línea de metro \na la que pertenece', style: TextStyle(fontSize: isTabletDevice ? 12.sp : 12.sp, color: Colors.white, fontWeight: FontWeight.bold))),
                                         DataColumn(label: Text('Estación', style: TextStyle(fontSize: isTabletDevice ? 12.sp : 12.sp, color: Colors.white, fontWeight: FontWeight.bold))),
                                         DataColumn(label: Text('Acción', style: TextStyle(fontSize: isTabletDevice ? 12.sp : 12.sp, color: Colors.white, fontWeight: FontWeight.bold)))
@@ -674,7 +689,7 @@ class _ModifyTableState extends State<ModifyTable> {
                   );
 
                   try{
-                    final response = await ApiServiceLineas('https://api.encuesta.opret.gob.do').postLinea(newLinea);
+                    final response = await ApiServiceLineas(AppConfig.apiUrl).postLinea(newLinea);
 
                     if(response.statusCode == 201) {
                       print('La linea fue creado con éxito');
@@ -769,7 +784,7 @@ class _ModifyTableState extends State<ModifyTable> {
                   );
 
                   try{
-                    final response = await ApiServiceLineas('https://api.encuesta.opret.gob.do').putLinea(lineaUpload.idLinea, upLoadLinea);
+                    final response = await ApiServiceLineas(AppConfig.apiUrl).putLinea(lineaUpload.idLinea, upLoadLinea);
 
                     if(response.statusCode == 204) {
                       print('La linea fue modificada con éxito');
@@ -808,7 +823,7 @@ class _ModifyTableState extends State<ModifyTable> {
               child: Text('Eliminar', style: TextStyle(fontSize: isTabletDevice ? 15.sp : 15.sp, fontWeight: FontWeight.bold)),
               onPressed: () async {
                 try{
-                  final response = await ApiServiceLineas('https://api.encuesta.opret.gob.do').deleteLineas(lineaDelete.idLinea);
+                  final response = await ApiServiceLineas(AppConfig.apiUrl).deleteLineas(lineaDelete.idLinea);
 
                   if (response.statusCode == 204) {
                     print('Linea eliminado con éxito');
@@ -884,8 +899,13 @@ class _ModifyTableState extends State<ModifyTable> {
                         errorSize: isTabletDevice ? 10.sp : 10.sp,
                       ),
                       style: TextStyle(fontSize: isTabletDevice ? 11.5.sp : 11.5.sp, color: const Color.fromARGB(255, 1, 1, 1)),
-                      validator: FormBuilderValidators.numeric(errorText: 'Este campo es requerido')
+                      validator: FormBuilderValidators.compose([
+                        FormBuilderValidators.required(errorText: 'Este campo es requerido'),
+                        FormBuilderValidators.numeric(errorText: 'Debe ser un número'),
+                      ])
                     ),
+
+                    laberOrden(),
 
                     selectorLinea(),
 
@@ -903,7 +923,7 @@ class _ModifyTableState extends State<ModifyTable> {
                     final newIdEstacion = int.parse(dataStation['No']);
 
                     // Verificamos si la estación ya existe
-                    Estacion? existingStation = await ApiServiceEstacion('https://api.encuesta.opret.gob.do').getOneEstacion(newIdEstacion);
+                    Estacion? existingStation = await ApiServiceEstacion(AppConfig.apiUrl).getOneEstacion(newIdEstacion);
 
                     if (existingStation != null) {
 
@@ -937,13 +957,14 @@ class _ModifyTableState extends State<ModifyTable> {
                     Estacion newStation = Estacion(
                       idEstacion: newIdEstacion, 
                       idLinea: _savedLinea!, 
-                      nombreEstacion: dataStation['Estacion']
+                      nombreEstacion: dataStation['Estacion'],
+                      orden:  int.tryParse(dataStation['Orden'] ?? '')
                     );
 
                     print('Resultados de newStation: $newStation');
 
                     try{
-                      final response = await ApiServiceEstacion('https://api.encuesta.opret.gob.do').postEstacion(newStation);
+                      final response = await ApiServiceEstacion(AppConfig.apiUrl).postEstacion(newStation);
 
                       if(response.statusCode == 201) {
                         print('La estacion fue creado con éxito');
@@ -971,6 +992,29 @@ class _ModifyTableState extends State<ModifyTable> {
   }
 
   //Widget controladores de interacion--------------------------------------------------------------------------
+  FormBuilderTextField laberOrden() {
+    final isTabletDevice = isTablet(context);
+
+    return FormBuilderTextField(
+      name: 'Orden',
+      keyboardType: TextInputType.number,
+      decoration: InputDecorations.inputDecoration(
+        labeltext: 'Orden de la Estación',
+        labelFrontSize: isTabletDevice ? 15.sp : 15.sp,
+        hintext: '#',
+        hintFrontSize: isTabletDevice ? 10.sp : 10.sp,
+        icono: Icon(Icons.arrow_upward , size: isTabletDevice ? 15.sp : 15.sp),
+        errorSize: isTabletDevice ? 10.sp : 10.sp,
+      ),
+      style: TextStyle(fontSize: isTabletDevice ? 11.5.sp : 11.5.sp, color: const Color.fromARGB(255, 1, 1, 1)),
+      validator: (value) {
+        if(value == null || value.isEmpty) return null;
+        if(int.tryParse(value) == null) return 'Debe ser un número';
+        return null;
+      }
+    );
+  }
+
   FormBuilderTextField labelEstacion() {
     final isTabletDevice = isTablet(context);
     return FormBuilderTextField(
@@ -1020,7 +1064,9 @@ class _ModifyTableState extends State<ModifyTable> {
   //-----------------------------------------------------------------------------------------------------------------------------
 
   void _showEditDialogEstacion(Estacion estacionUpload) {
+    _savedLinea = estacionUpload.idLinea;
     final isTabletDevice = isTablet(context);
+
     showDialog(
       context: context, 
       builder: (context) {
@@ -1034,11 +1080,13 @@ class _ModifyTableState extends State<ModifyTable> {
               key: _formKey,
               initialValue: {
                 'idLinea': estacionUpload.idLinea,
-                'Estacion': estacionUpload.nombreEstacion
+                'Estacion': estacionUpload.nombreEstacion,
+                'Orden': estacionUpload.orden?.toString() ?? ''
               },
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
+                  laberOrden(),
                   selectorLinea(),
                   labelEstacion(),
                 ],
@@ -1054,12 +1102,14 @@ class _ModifyTableState extends State<ModifyTable> {
 
                   Estacion stationUpload = Estacion(
                     idEstacion: estacionUpload.idEstacion, 
-                    idLinea: estacionUpload.idLinea, 
-                    nombreEstacion: dataStation['Estacion']
+                    // idLinea: estacionUpload.idLinea,
+                    idLinea: _savedLinea!,
+                    nombreEstacion: dataStation['Estacion'],
+                    orden:  int.tryParse(dataStation['Orden'] ?? '')
                   );
 
                   try{
-                    final response = await ApiServiceEstacion('https://api.encuesta.opret.gob.do').putEstacion(estacionUpload.idEstacion, stationUpload);
+                    final response = await ApiServiceEstacion(AppConfig.apiUrl).putEstacion(estacionUpload.idEstacion, stationUpload);
 
                     if(response.statusCode == 204) {
                       print('La Estación fue modificada con éxito');
@@ -1098,7 +1148,7 @@ class _ModifyTableState extends State<ModifyTable> {
               child: Text('Eliminar', style: TextStyle(fontSize: isTabletDevice ? 15.sp : 15.sp, fontWeight: FontWeight.bold)),
               onPressed: () async {
                 try{
-                  final response = await ApiServiceEstacion('https://api.encuesta.opret.gob.do').deleteEstacion(estacionDelete.idEstacion);
+                  final response = await ApiServiceEstacion(AppConfig.apiUrl).deleteEstacion(estacionDelete.idEstacion);
 
                   if (response.statusCode == 204) {
                     print('Estación eliminado con éxito');
@@ -1394,6 +1444,7 @@ class _EstacionDataSource extends DataTableSource {
         )
         */
         buildTextCell(estacion.idEstacion.toString()),
+        buildTextCell(estacion.orden.toString()),
         buildTextCell(estacion.idLinea),
         buildTextCell(estacion.nombreEstacion),
         buildActionCell(

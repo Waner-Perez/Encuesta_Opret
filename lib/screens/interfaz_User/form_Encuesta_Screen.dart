@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:formulario_opret/config/app_config.dart';
 import 'package:formulario_opret/models/Stored%20Procedure/sp_ObtenerEstacionPorLinea.dart';
 import 'package:formulario_opret/models/formulario_Registro.dart';
 import 'package:formulario_opret/screens/interfaz_User/navbarUser/navbar_Empl.dart';
@@ -31,9 +32,9 @@ class FormEncuestaScreen extends StatefulWidget {
 
 class _FormEncuestaScreenState extends State<FormEncuestaScreen> {
   final _formKey = GlobalKey<FormBuilderState>();
-  final ApiServiceFormRegistro _apiServiceFormRegistro = ApiServiceFormRegistro('https://api.encuesta.opret.gob.do');
-  final ApiServiceLineas _apiServiceLineas = ApiServiceLineas('https://api.encuesta.opret.gob.do');
-  final ApiServiceEstacion _apiServiceEstacion = ApiServiceEstacion('https://api.encuesta.opret.gob.do');
+  final ApiServiceFormRegistro _apiServiceFormRegistro = ApiServiceFormRegistro(AppConfig.apiUrl);
+  final ApiServiceLineas _apiServiceLineas = ApiServiceLineas(AppConfig.apiUrl);
+  final ApiServiceEstacion _apiServiceEstacion = ApiServiceEstacion(AppConfig.apiUrl);
   final TextEditingController noEncuestaFiltrar = TextEditingController();
   String? _selectLineMetro; // Línea seleccionada
   int? _selectedStation; // Estación seleccionada
@@ -336,7 +337,6 @@ class _FormEncuestaScreenState extends State<FormEncuestaScreen> {
                               _showErrorDialog(context, 'Es obligatorio elegir una Estación del metro');
                               return 'Este campo es requerido';
                             }
-        
                             return null;
                           },
                           decoration: InputDecorations.inputDecoration(

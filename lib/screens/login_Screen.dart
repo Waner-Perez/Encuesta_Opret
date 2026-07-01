@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:formulario_opret/config/app_config.dart';
 import 'package:formulario_opret/models/login.dart';
 import 'package:formulario_opret/screens/forgotPassword_screen.dart';
 import 'package:formulario_opret/screens/interfaz_Admin/navbar/pregunta_screen_navBar.dart';
@@ -28,7 +29,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _filtrarId = TextEditingController();
   // final TextEditingController _filtrarCedula = TextEditingController();
 
-  final ApiServiceToken _serviceToken = ApiServiceToken('https://api.encuesta.opret.gob.do',false);
+  final ApiServiceToken _serviceToken = ApiServiceToken(AppConfig.apiUrl,false);
   String myToken ="";
   bool _isLoading = false;
   bool _obscureText = true;

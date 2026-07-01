@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:formulario_opret/config/app_config.dart';
 import 'package:formulario_opret/models/resertPassword.dart';
 import 'package:formulario_opret/screens/presentation_screen.dart';
 import 'package:formulario_opret/screens/resertPassword_screen.dart';
@@ -24,7 +25,7 @@ class ForgotpasswordScreen extends StatefulWidget {
 
 class _ForgotpasswordScreenState extends State<ForgotpasswordScreen> {
   final _formkey = GlobalKey<FormBuilderState>();
-  final ApiResertPasswordServices _apiResertPassServ = ApiResertPasswordServices('https://api.encuesta.opret.gob.do');
+  final ApiResertPasswordServices _apiResertPassServ = ApiResertPasswordServices(AppConfig.apiUrl);
 
   bool isTablet(BuildContext context) {
     final size = MediaQuery.of(context).size;

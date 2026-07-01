@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:formulario_opret/config/app_config.dart';
 // import 'package:formulario_opret/screens/navbar/editar_screen.dart';
 import 'package:formulario_opret/screens/interfaz_Admin/navbar/pregunta_screen_navBar.dart';
 import 'package:formulario_opret/screens/interfaz_Admin/navbar/registro_Empldo.dart';
@@ -29,7 +30,7 @@ class _NavbarState extends State<Navbar> {
 
   @override
   Widget build(BuildContext context) {
-    final ApiServiceToken _apiServiceToken = ApiServiceToken('https://api.encuesta.opret.gob.do',false);
+    final ApiServiceToken _apiServiceToken = ApiServiceToken(AppConfig.apiUrl,false);
 
     return Drawer(
       // Creación del menú desplegable

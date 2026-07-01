@@ -41,11 +41,13 @@ class Linea {
   String idLinea;
   String tipo;
   String nombreLinea;
+  Estacion? estacion_;
 
   Linea({
     required this.idLinea,
     required this.tipo,
-    required this.nombreLinea
+    required this.nombreLinea,
+    this.estacion_
   });
 
   factory Linea.fromJson(Map<String, dynamic> json) {
@@ -53,6 +55,8 @@ class Linea {
       idLinea: json['idLinea'],
       tipo: json['tipoLinea'],
       nombreLinea: json['nombreLinea'],
+      estacion_: json['estacion_'] != null
+        ? Estacion.fromJson(json['estacion_']) : null
     );
   }
 
@@ -69,11 +73,13 @@ class Estacion {
   int idEstacion;
   String idLinea;
   String nombreEstacion;
+  int? orden;
 
   Estacion({
     required this.idEstacion,
     required this.idLinea,
-    required this.nombreEstacion
+    required this.nombreEstacion,
+    this.orden
   });
 
   factory Estacion.fromJson(Map<String, dynamic> json) {
@@ -81,6 +87,7 @@ class Estacion {
       idEstacion: json['idEstacion'],
       idLinea: json['idLinea'],
       nombreEstacion: json['nombreEstacion'],
+      orden: json['orden'] != null ? json['orden'] as int : 0,
     );
   }
 
@@ -89,6 +96,7 @@ class Estacion {
     data['idEstacion'] = idEstacion;
     data['idLinea'] = idLinea;
     data['nombreEstacion'] = nombreEstacion;
+    data['orden'] = orden;
     return data;
   }
 }

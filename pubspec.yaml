@@ -57,6 +57,7 @@ dependencies:
   table_calendar: ^3.1.3
   open_file: ^3.5.10
   intl: ^0.20.2
+  flutter_dotenv: ^6.0.1
   # flutter_keyboard_visibility: ^6.0.0
 
   # The following adds the Cupertino Icons font to your application.
@@ -90,6 +91,7 @@ flutter:
     - assets/Logo/
     - assets/Fondo/
     - assets/Flechas/
+    - .env
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

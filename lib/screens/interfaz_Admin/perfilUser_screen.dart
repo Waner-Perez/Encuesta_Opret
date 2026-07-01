@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
+import 'package:formulario_opret/config/app_config.dart';
 import 'package:formulario_opret/models/usuarios.dart';
 import 'package:formulario_opret/screens/interfaz_Admin/navbar/navbar.dart';
 import 'package:formulario_opret/services/user_services.dart';
@@ -27,7 +28,7 @@ class PerfiluserScreen extends StatefulWidget {
 
 class _PerfiluserScreenState extends State<PerfiluserScreen> {
   final formKey = GlobalKey<FormBuilderState>();
-  final ApiServiceUser _apiServiceUser = ApiServiceUser('https://api.encuesta.opret.gob.do'); // Servicio para obtener datos del usuario
+  final ApiServiceUser _apiServiceUser = ApiServiceUser(AppConfig.apiUrl); // Servicio para obtener datos del usuario
   late Future<Usuarios?> _userData;
   final TextEditingController datePicker = TextEditingController();
   String selectedRole = 'Empleado';
