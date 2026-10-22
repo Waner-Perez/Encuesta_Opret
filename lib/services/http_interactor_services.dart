@@ -4,8 +4,14 @@ import 'package:http/http.dart' as http;
 
 class ApiService {
   final String baseUrl;
+  static String? token;
 
   ApiService(this.baseUrl);
+
+  Map<String, String> headers({bool isJson = false}) => {
+    if (isJson) 'Content-Type': 'application/json',
+    if (token != null) 'Authorization': 'Bearer $token',
+  };
 
   //para verificar si hay conexión a internet
   Future<bool> _hasInternetConnection() async {
@@ -38,7 +44,7 @@ class ApiService {
     if (isCheckOk) {
       try {
         final url = Uri.parse('$baseUrl/api/$endpoint');
-        final response = await http.get(url);
+        final response = await http.get(url, headers: headers());
         if (response.statusCode == 200) {
           return json.decode(response.body);
         } else {
@@ -67,7 +73,7 @@ class ApiService {
 
     try {
       final url = Uri.parse('$baseUrl/api/$endpoint/$id');
-      final response = await http.get(url);
+      final response = await http.get(url, headers: headers());
 
       if (response.statusCode == 200) {
         return json.decode(response.body); // Devolver JSON decodificado
@@ -97,7 +103,7 @@ class ApiService {
         final url = Uri.parse('$baseUrl/api/$endpoint');
         return await http.post(
           url,
-          headers: {'Content-Type': 'application/json'},
+          headers: headers(isJson: true),
           body: json.encode(data),
         );
       } else {
@@ -129,7 +135,7 @@ class ApiService {
     try {
       final response = await http.post(
         url,
-        headers: {'Content-Type': 'application/json'},
+        headers: headers(isJson: true),
         body: json.encode(data),
       )/*.timeout(const Duration(seconds: 30))*/;
 
@@ -160,7 +166,7 @@ class ApiService {
         final url = Uri.parse('$baseUrl/api/$endpoint/$id');
         return await http.put(
           url,
-          headers: {'Content-Type': 'application/json'},
+          headers: headers(isJson: true),
           body: json.encode(data),
         );
       } else {
@@ -185,7 +191,7 @@ class ApiService {
         final url = Uri.parse('$baseUrl/api/$endpoint/$id');
         return await http.put(
           url,
-          headers: {'Content-Type': 'application/json'},
+          headers: headers(isJson: true),
           body: json.encode(data),
         );
       } else {
@@ -209,7 +215,7 @@ class ApiService {
     try {
       if (isCheckOk) {
         final url = Uri.parse('$baseUrl/api/$endpoint/$id');
-        return await http.delete(url);
+        return await http.delete(url, headers: headers());
       } else {
         throw Exception('La API no está disponible');
       }
@@ -219,20 +225,3 @@ class ApiService {
     }
   }
 }
-
-// Método POST en listados
-// Future<http.Response> postDataList(String endpoint, List<Map<String, dynamic>> data) async {
-//
-//   print('data: $data');
-//   final isCheckOk = await check();
-//   if (isCheckOk) {
-//     final url = Uri.parse('$baseUrl/api/$endpoint');
-//     return await http.post(
-//       url,
-//       headers: {'Content-Type': 'application/json'},
-//       body: json.encode(data),
-//     )/*.timeout(const Duration(seconds: 30))*/;
-//   } else {
-//     throw Exception('La API no está disponible');
-//   }
-// }

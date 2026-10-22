@@ -1,17 +1,24 @@
 import 'dart:io';
 import 'package:formulario_opret/models/Stored%20Procedure/sp_ObtenerEstacionPorLinea.dart';
 import 'package:formulario_opret/models/formulario_Registro.dart';
+import 'package:formulario_opret/services/http_interactor_services.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class ApiServiceEstacion {
   final String baseUrl;
+  final ApiService service;
 
-  ApiServiceEstacion(this.baseUrl);
+  ApiServiceEstacion(this.baseUrl) : service = ApiService(baseUrl);
 
   Future<List<Estacion>> getEstacion() async {
     try{
-      final response = await http.get(Uri.parse('$baseUrl/api/Estacions')).timeout(const Duration(seconds: 30));
+      print('TOKEN: ${ApiService.token}');
+
+      final response = await http.get(
+        Uri.parse('$baseUrl/api/Estacions'),
+        headers: service.headers(),
+      ).timeout(const Duration(seconds: 30));
 
       if(response.statusCode == 200) {
         List<dynamic> body = jsonDecode(response.body);
@@ -30,9 +37,7 @@ class ApiServiceEstacion {
     try {
       final response = await http.get(
         Uri.parse('$baseUrl/api/Estacions/$id'),
-        headers: {
-          HttpHeaders.contentTypeHeader: 'application/json',
-        },
+        headers: service.headers(),
       ).timeout(const Duration(seconds: 30)); // Limitar el tiempo de espera
 
       if (response.statusCode == 200) {
@@ -55,8 +60,10 @@ class ApiServiceEstacion {
   // Método para obtener estaciones por línea
   Future<List<EstacionPorLinea>> getEstacionesPorLinea(String idLinea) async {
     try {
-      final response = await http.get(Uri.parse('$baseUrl/api/Estacions/linea/$idLinea'))
-        .timeout(const Duration(seconds: 30));
+      final response = await http.get(
+        Uri.parse('$baseUrl/api/Estacions/linea/$idLinea'),
+        headers: service.headers(),
+      ).timeout(const Duration(seconds: 30));
 
       if (response.statusCode == 200) {
         List<dynamic> body = jsonDecode(response.body)['result'];
@@ -75,9 +82,7 @@ class ApiServiceEstacion {
     try{
       final response = await http.post(
         Uri.parse('$baseUrl/api/Estacions'),
-        headers: {
-          HttpHeaders.contentTypeHeader: 'application/json',
-        },
+        headers: service.headers(isJson: true),
         body: jsonEncode(station.toJson()),
       ).timeout(const Duration(seconds: 30));
 
@@ -100,9 +105,7 @@ class ApiServiceEstacion {
     try{
       final response = await http.put(
         Uri.parse('$baseUrl/api/Estacions/$id'),
-        headers: {
-          HttpHeaders.contentTypeHeader: 'application/json',
-        },
+        headers: service.headers(isJson: true),
         body: jsonEncode(station.toJson()),
       ).timeout(const Duration(seconds: 30));
 
@@ -124,6 +127,7 @@ class ApiServiceEstacion {
     try{
       final response = await http.delete(
         Uri.parse('$baseUrl/api/Estacions/$id'),
+        headers: service.headers(),
       ).timeout(const Duration(seconds: 30));
 
       if(response.statusCode == 204) {

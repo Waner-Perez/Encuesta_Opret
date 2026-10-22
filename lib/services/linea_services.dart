@@ -1,16 +1,21 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:formulario_opret/models/formulario_Registro.dart';
+import 'package:formulario_opret/services/http_interactor_services.dart';
 import 'package:http/http.dart' as http;
 
 class ApiServiceLineas {
   final String baseUrl;
+  final ApiService service;
 
-  ApiServiceLineas(this.baseUrl);
+  ApiServiceLineas(this.baseUrl) : service = ApiService(baseUrl);
 
   Future<List<Linea>> getLinea() async {
     try{
-      final response = await http.get(Uri.parse('$baseUrl/api/Lineas')).timeout(const Duration(seconds: 30));
+      final response = await http.get(
+        Uri.parse('$baseUrl/api/Lineas'),
+        headers: service.headers(),
+      ).timeout(const Duration(seconds: 30));
 
       if(response.statusCode == 200) {
         List<dynamic> body = jsonDecode(response.body);
@@ -29,9 +34,7 @@ class ApiServiceLineas {
     try{
       final response = await http.post(
         Uri.parse('$baseUrl/api/Lineas'),
-        headers: {
-          HttpHeaders.contentTypeHeader: 'application/json',
-        },
+        headers: service.headers(isJson: true),
         body: jsonEncode(linea.toJson()),
       ).timeout(const Duration(seconds: 30));
 
@@ -54,9 +57,7 @@ class ApiServiceLineas {
     try{
       final response = await http.put(
         Uri.parse('$baseUrl/api/Lineas/$id'),
-        headers: {
-          HttpHeaders.contentTypeHeader: 'application/json',
-        },
+        headers: service.headers(isJson: true),
         body: jsonEncode(linea.toJson()),
       ).timeout(const Duration(seconds: 30));
 
@@ -78,6 +79,7 @@ class ApiServiceLineas {
     try{
       final response = await http.delete(
         Uri.parse('$baseUrl/api/Lineas/$id'),
+        headers: service.headers(),
       ).timeout(const Duration(seconds: 30));
 
       if(response.statusCode == 204) {
@@ -87,11 +89,7 @@ class ApiServiceLineas {
         final responseBody = jsonDecode(response.body);
         print('Error del backend: ${responseBody['message']}');
         return response;
-      }/* else {
-        print('Error al eliminar la Linea: ${response.statusCode}');
-        return response;
-        // print('Cuerpo de la respuesta: ${response.body}');
-      }*/
+      }
 
       return response;
     }catch (e) {

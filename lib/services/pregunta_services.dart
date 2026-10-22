@@ -2,17 +2,22 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:formulario_opret/models/Stored%20Procedure/sp_preguntasCompleta.dart';
 import 'package:formulario_opret/models/pregunta.dart';
+import 'package:formulario_opret/services/http_interactor_services.dart';
 import 'package:http/http.dart' as http;
 
 class ApiServicePreguntas {
   final String baseUrl;
+  final ApiService service;
 
-  ApiServicePreguntas(this.baseUrl);
+  ApiServicePreguntas(this.baseUrl) : service = ApiService(baseUrl);
 
   // GET: api/SesionPreguntas
   Future<List<Preguntas>> getPreguntas() async {
     try{
-      final response = await http.get(Uri.parse('$baseUrl/api/Preguntas')).timeout(const Duration(seconds: 30));
+      final response = await http.get(
+        Uri.parse('$baseUrl/api/Preguntas'),
+        headers: service.headers(),
+      ).timeout(const Duration(seconds: 30));
 
       if(response.statusCode == 200) {
         List<dynamic> body = jsonDecode(response.body);
@@ -31,9 +36,7 @@ class ApiServicePreguntas {
     try{
       final response = await http.get(
         Uri.parse('$baseUrl/api/Preguntas/$id'),
-        headers: {
-          HttpHeaders.contentTypeHeader: 'application/json',
-        },
+        headers: service.headers(isJson: true),
       ).timeout(const Duration(seconds: 30));
 
       if (response.statusCode == 200) {
@@ -78,9 +81,10 @@ class ApiServicePreguntas {
     List<SpPreguntascompleta> dataQuestion = [];
 
     try {
-      final response = await http
-          .get(Uri.parse('$baseUrl/api/PreguntasCompletas/obtenerQuestion'))
-          .timeout(const Duration(seconds: 30));
+      final response = await http.get(
+        Uri.parse('$baseUrl/api/PreguntasCompletas/obtenerQuestion'),
+        headers: service.headers(),
+      ).timeout(const Duration(seconds: 30));
 
       if (response.statusCode == 200) {
         List<dynamic> jsonData = jsonDecode(response.body);
@@ -104,9 +108,7 @@ class ApiServicePreguntas {
     try{
       final response = await http.post(
         Uri.parse('$baseUrl/api/Preguntas'),
-        headers: {
-          HttpHeaders.contentTypeHeader: 'application/json',
-        },
+        headers: service.headers(isJson: true),
         body: jsonEncode(pregunta.toJson()),
       ).timeout(const Duration(seconds: 30));
 
@@ -130,9 +132,7 @@ class ApiServicePreguntas {
     try{
       final response = await http.put(
         Uri.parse('$baseUrl/api/Preguntas/$id'),
-        headers: {
-          HttpHeaders.contentTypeHeader: 'application/json',
-        },
+        headers: service.headers(isJson: true),
         body: jsonEncode(pregunta.toJson()),
       ).timeout(const Duration(seconds: 30));
 
@@ -155,6 +155,7 @@ class ApiServicePreguntas {
     try{
       final response = await http.delete(
         Uri.parse('$baseUrl/api/Preguntas/$id'),
+        headers: service.headers(),
       ).timeout(const Duration(seconds: 30));
 
       if(response.statusCode == 204) {

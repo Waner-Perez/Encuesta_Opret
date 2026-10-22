@@ -15,8 +15,10 @@ import 'package:formulario_opret/screens/interfaz_Admin/navbar/registro_Empldo.d
 import 'package:formulario_opret/screens/new_User.dart';
 import 'package:formulario_opret/screens/presentation_screen.dart';
 import 'package:formulario_opret/screens/resertPassword_screen.dart';
+// import 'package:formulario_opret/services/http_interactor_services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart';
+// import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> getDatabasePath() async {
   final directory = await getApplicationDocumentsDirectory();
@@ -27,6 +29,10 @@ Future<void> getDatabasePath() async {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: '.env');
+
+  // final prefs = await SharedPreferences.getInstance();
+  // ApiService.token = prefs.getString('token');
+
   HttpOverrides.global = MyHttpOverrides();
   getDatabasePath();
 

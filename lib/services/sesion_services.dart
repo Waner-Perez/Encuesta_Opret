@@ -53,33 +53,32 @@ class ApiServiceSesion2 {
 
 class ApiServiceSesion {
   final String baseUrl;
+  final ApiService service;
 
-  ApiServiceSesion(this.baseUrl);
+  ApiServiceSesion(this.baseUrl) : service = ApiService(baseUrl);
 
-  Future<List<Sesion>> getSesion() async {
-    try{
-      final response = await http.get(Uri.parse('$baseUrl/api/Sesions')).timeout(const Duration(seconds: 30));
+  // Future<List<Sesion>> getSesion() async {
+  //   try{
+  //     final response = await http.get(Uri.parse('$baseUrl/api/Sesions')).timeout(const Duration(seconds: 30));
 
-      if(response.statusCode == 200) {
-        List<dynamic> body = jsonDecode(response.body);
-        return body.map((json) => Sesion.fromJson(json)).toList();
-      } else {
-        throw Exception('Error al cargar la sesion: ${response.statusCode}');
-      }
+  //     if(response.statusCode == 200) {
+  //       List<dynamic> body = jsonDecode(response.body);
+  //       return body.map((json) => Sesion.fromJson(json)).toList();
+  //     } else {
+  //       throw Exception('Error al cargar la sesion: ${response.statusCode}');
+  //     }
 
-    }catch(e){
-      print('Error al cargar la sesion: $e');
-      rethrow;
-    }
-  }
+  //   }catch(e){
+  //     print('Error al cargar la sesion: $e');
+  //     rethrow;
+  //   }
+  // }
 
   Future<http.Response> postSesion (Sesion sesion) async {
     try{
       final response = await http.post(
         Uri.parse('$baseUrl/api/Sesions'),
-        headers: {
-          HttpHeaders.contentTypeHeader: 'application/json',
-        },
+        headers: service.headers(isJson: true),
         body: jsonEncode(sesion.toJson()),
       ).timeout(const Duration(seconds: 30));
 
@@ -102,9 +101,7 @@ class ApiServiceSesion {
     try{
       final response = await http.put(
         Uri.parse('$baseUrl/api/Sesions/$id'),
-        headers: {
-          HttpHeaders.contentTypeHeader: 'application/json',
-        },
+        headers: service.headers(isJson: true),
         body: jsonEncode(sesion.toJson()),
       ).timeout(const Duration(seconds: 30));
 
@@ -126,6 +123,7 @@ class ApiServiceSesion {
     try{
       final response = await http.delete(
         Uri.parse('$baseUrl/api/Sesions/$id'),
+        headers: service.headers(),
       ).timeout(const Duration(seconds: 30));
 
       if(response.statusCode == 204) {

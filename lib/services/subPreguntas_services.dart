@@ -1,16 +1,21 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:formulario_opret/models/pregunta.dart';
+import 'package:formulario_opret/services/http_interactor_services.dart';
 import 'package:http/http.dart' as http;
 
 class ApiServiceSubPreguntas {
   final String baseUrl;
+  final ApiService service;
 
-  ApiServiceSubPreguntas(this.baseUrl);
+  ApiServiceSubPreguntas(this.baseUrl) : service = ApiService(baseUrl);
 
   Future<List<SubPregunta>> getSubPreg() async {
     try{
-      final response = await http.get(Uri.parse('$baseUrl/api/SubPreguntas')).timeout(const Duration(seconds: 30));
+      final response = await http.get(
+        Uri.parse('$baseUrl/api/SubPreguntas'),
+        headers: service.headers(),
+      ).timeout(const Duration(seconds: 30));
 
       if(response.statusCode == 200) {
         List<dynamic> body = jsonDecode(response.body);
@@ -29,9 +34,7 @@ class ApiServiceSubPreguntas {
     try{
       final response = await http.get(
         Uri.parse('$baseUrl/api/SubPreguntas/$id'),
-        headers: {
-          HttpHeaders.contentTypeHeader: 'application/json',
-        },
+        headers: service.headers(isJson: true),
       ).timeout(const Duration(seconds: 30));
 
       if (response.statusCode == 200) {
@@ -53,9 +56,7 @@ class ApiServiceSubPreguntas {
     try{
       final response = await http.post(
         Uri.parse('$baseUrl/api/SubPreguntas'),
-        headers: {
-          HttpHeaders.contentTypeHeader: 'application/json',
-        },
+        headers: service.headers(isJson: true),
         body: jsonEncode(subPreg.toJson()),
       ).timeout(const Duration(seconds: 30));
 
@@ -78,9 +79,7 @@ class ApiServiceSubPreguntas {
     try{
       final response = await http.put(
         Uri.parse('$baseUrl/api/SubPreguntas/$cod'),
-        headers: {
-          HttpHeaders.contentTypeHeader: 'application/json',
-        },
+        headers: service.headers(isJson: true),
         body: jsonEncode(subPreg.toJson()),
       ).timeout(const Duration(seconds: 30));
 
@@ -102,6 +101,7 @@ class ApiServiceSubPreguntas {
     try{
       final response = await http.delete(
         Uri.parse('$baseUrl/api/SubPreguntas/$cod'),
+        headers: service.headers(),
       ).timeout(const Duration(seconds: 30));
 
       if(response.statusCode == 204) {

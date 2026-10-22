@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:formulario_opret/models/login.dart';
 import 'package:formulario_opret/screens/login_Screen.dart';
+import 'package:formulario_opret/services/http_interactor_services.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -28,6 +29,7 @@ class ApiServiceToken {
 
         String token = jsonResponse['result'];
         isLogged = true;
+        ApiService.token = token; // Guardar el token en la variable estática de ApiService
         // Guardar el token en SharedPreferences
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setString('token', token);
@@ -69,6 +71,7 @@ class ApiServiceToken {
         if (response.statusCode == 200) {
           await prefs.remove('token');
           isLogged = false;
+          ApiService.token = null; // Limpiar el token en la variable estática de ApiService
 
           Navigator.pushAndRemoveUntil(
             context,
