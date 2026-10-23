@@ -17,7 +17,7 @@ class ApiServicePreguntas {
       final response = await http.get(
         Uri.parse('$baseUrl/api/Preguntas'),
         headers: service.headers(),
-      ).timeout(const Duration(seconds: 30));
+      );
 
       if(response.statusCode == 200) {
         List<dynamic> body = jsonDecode(response.body);
@@ -37,7 +37,7 @@ class ApiServicePreguntas {
       final response = await http.get(
         Uri.parse('$baseUrl/api/Preguntas/$id'),
         headers: service.headers(isJson: true),
-      ).timeout(const Duration(seconds: 30));
+      );
 
       if (response.statusCode == 200) {
         var body = jsonDecode(response.body);
@@ -84,7 +84,7 @@ class ApiServicePreguntas {
       final response = await http.get(
         Uri.parse('$baseUrl/api/PreguntasCompletas/obtenerQuestion'),
         headers: service.headers(),
-      ).timeout(const Duration(seconds: 30));
+      );
 
       if (response.statusCode == 200) {
         List<dynamic> jsonData = jsonDecode(response.body);
@@ -110,7 +110,7 @@ class ApiServicePreguntas {
         Uri.parse('$baseUrl/api/Preguntas'),
         headers: service.headers(isJson: true),
         body: jsonEncode(pregunta.toJson()),
-      ).timeout(const Duration(seconds: 30));
+      );
 
       if(response.statusCode == 201){
         print('Pregunta creada con éxito');
@@ -134,7 +134,7 @@ class ApiServicePreguntas {
         Uri.parse('$baseUrl/api/Preguntas/$id'),
         headers: service.headers(isJson: true),
         body: jsonEncode(pregunta.toJson()),
-      ).timeout(const Duration(seconds: 30));
+      );
 
       if(response.statusCode == 204) {
         print('Pregunta actualizada con éxito');
@@ -156,7 +156,7 @@ class ApiServicePreguntas {
       final response = await http.delete(
         Uri.parse('$baseUrl/api/Preguntas/$id'),
         headers: service.headers(),
-      ).timeout(const Duration(seconds: 30));
+      );
 
       if(response.statusCode == 204) {
         print('Pregunta eliminada con éxito');

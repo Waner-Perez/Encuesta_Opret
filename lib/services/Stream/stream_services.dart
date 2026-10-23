@@ -13,13 +13,12 @@ class StreamServices {
   int retryCount = 0;
 
   StreamServices(
-        this.baseUrl,
-        {
-          this.retryInterval = const Duration(minutes: 30),
-          this.httpTimeout = const Duration(minutes: 30),
-          this.maxRetries = 5
-        }
-      ) {
+    this.baseUrl,
+    {
+      this.retryInterval = const Duration(seconds: 5),
+      this.httpTimeout = const Duration(seconds: 5),
+      this.maxRetries = 99
+    }) {
 
     Connectivity().checkConnectivity().then((result) {
       if (result != ConnectivityResult.none) {
