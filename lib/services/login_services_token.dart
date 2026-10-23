@@ -68,10 +68,10 @@ class ApiServiceToken {
           }
         );
 
-        if (response.statusCode == 200) {
+        if (response.statusCode == 200 || response.statusCode == 401) {
           await prefs.remove('token');
+          ApiService.token = null;
           isLogged = false;
-          ApiService.token = null; // Limpiar el token en la variable estática de ApiService
 
           Navigator.pushAndRemoveUntil(
             context,

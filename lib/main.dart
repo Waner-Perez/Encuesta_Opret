@@ -15,6 +15,8 @@ import 'package:formulario_opret/screens/interfaz_Admin/navbar/registro_Empldo.d
 import 'package:formulario_opret/screens/new_User.dart';
 import 'package:formulario_opret/screens/presentation_screen.dart';
 import 'package:formulario_opret/screens/resertPassword_screen.dart';
+import 'package:formulario_opret/services/auth_services.dart';
+import 'package:http/http.dart' as http;
 // import 'package:formulario_opret/services/http_interactor_services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart';
@@ -26,7 +28,11 @@ Future<void> getDatabasePath() async {
   print('Database path: $path');
 }
 
-void main() async {
+void main() {
+  http.runWithClient(iniciarApp, () => AuthClient());
+}
+
+Future<void> iniciarApp() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: '.env');
 
@@ -81,6 +87,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorKey: navigatorKey,
       debugShowCheckedModeBanner: false,
       title: 'Material App',
       routes: {
